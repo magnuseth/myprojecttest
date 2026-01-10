@@ -42,6 +42,16 @@ export default function Layout({ children, currentPageName }) {
               >
                 Предиктор
               </Link>
+              <Link 
+                to={createPageUrl('Settings')} 
+                className={`text-sm font-medium transition-colors ${
+                  currentPageName === 'Settings' 
+                    ? 'text-emerald-400' 
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Настройки
+              </Link>
             </div>
           </div>
         </div>
