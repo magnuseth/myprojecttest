@@ -1,10 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, RotateCcw, Bomb } from 'lucide-react';
+import { Sparkles, RotateCcw, Bomb, Hash } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
 
-export default function ControlPanel({ mineCount, onMineCountChange, onPredict, onReset, isRevealed }) {
+export default function ControlPanel({ 
+  mineCount, 
+  onMineCountChange, 
+  onPredict, 
+  onReset, 
+  isRevealed,
+  clientSeed,
+  serverSeed,
+  onClientSeedChange,
+  onServerSeedChange
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -45,6 +56,35 @@ export default function ControlPanel({ mineCount, onMineCountChange, onPredict, 
         <div className="flex justify-between mt-2 text-xs text-slate-500">
           <span>1 мина</span>
           <span>24 мины</span>
+        </div>
+      </div>
+
+      {/* Seeds */}
+      <div className="mb-6 space-y-4">
+        <div>
+          <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+            <Hash className="w-4 h-4 text-purple-400" />
+            Client Seed
+          </label>
+          <Input
+            value={clientSeed}
+            onChange={(e) => onClientSeedChange(e.target.value)}
+            placeholder="Введите client seed"
+            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20"
+          />
+        </div>
+        
+        <div>
+          <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+            <Hash className="w-4 h-4 text-blue-400" />
+            Server Seed
+          </label>
+          <Input
+            value={serverSeed}
+            onChange={(e) => onServerSeedChange(e.target.value)}
+            placeholder="Введите server seed"
+            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
+          />
         </div>
       </div>
 

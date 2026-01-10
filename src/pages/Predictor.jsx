@@ -8,19 +8,77 @@ export default function Predictor() {
   const [mineCount, setMineCount] = useState(3);
   const [safeCells, setSafeCells] = useState([]);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [clientSeed, setClientSeed] = useState('');
+  const [serverSeed, setServerSeed] = useState('');
 
   const totalCells = 25;
 
+  // Функция для воспроизведения звука
+  const playPredictSound = () => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Создаём серию звуков для эффекта
+    const times = [0, 0.1, 0.2];
+    const frequencies = [800, 1000, 1200];
+    
+    times.forEach((time, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = frequencies[index];
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + time);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + time + 0.3);
+      
+      oscillator.start(audioContext.currentTime + time);
+      oscillator.stop(audioContext.currentTime + time + 0.3);
+    });
+  };
+
+  // Простая хеш-функция для seed
+  const hashSeed = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  };
+
+  // Генератор псевдослучайных чисел на основе seed
+  const seededRandom = (seed) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
   const handlePredict = () => {
-    // Генерируем случайные безопасные ячейки
+    // Воспроизводим звук
+    playPredictSound();
+    
+    // Генерируем безопасные ячейки
     const safeCount = totalCells - mineCount;
     const allCells = Array.from({ length: totalCells }, (_, i) => i);
     
-    // Перемешиваем массив и берём первые safeCount ячеек
-    const shuffled = allCells.sort(() => Math.random() - 0.5);
-    const safe = shuffled.slice(0, safeCount);
+    // Если указаны seeds, используем их для генерации
+    if (clientSeed && serverSeed) {
+      const combinedSeed = hashSeed(clientSeed + serverSeed);
+      const shuffled = allCells.sort((a, b) => {
+        return seededRandom(combinedSeed + a) - seededRandom(combinedSeed + b);
+      });
+      const safe = shuffled.slice(0, safeCount);
+      setSafeCells(safe);
+    } else {
+      // Иначе случайная генерация
+      const shuffled = allCells.sort(() => Math.random() - 0.5);
+      const safe = shuffled.slice(0, safeCount);
+      setSafeCells(safe);
+    }
     
-    setSafeCells(safe);
     setIsRevealed(true);
   };
 
@@ -113,6 +171,10 @@ export default function Predictor() {
               onPredict={handlePredict}
               onReset={handleReset}
               isRevealed={isRevealed}
+              clientSeed={clientSeed}
+              serverSeed={serverSeed}
+              onClientSeedChange={setClientSeed}
+              onServerSeedChange={setServerSeed}
             />
 
             {/* Дополнительная информация */}
