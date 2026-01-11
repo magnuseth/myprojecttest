@@ -195,102 +195,68 @@ export default function ChickenPredictor() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Игровое поле */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Результат */}
+          <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 border-2 border-slate-700 shadow-2xl"
+              className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 border-2 border-slate-700 shadow-2xl h-full"
             >
-              {isRevealed && (
+              {isRevealed ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mb-6 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-amber-500/20 rounded-2xl p-5 border-2 border-yellow-500/30 shadow-lg shadow-yellow-500/10"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="text-3xl">🐔</div>
-                      <div>
-                        <p className="text-yellow-400 font-bold text-lg">{t('prediction_ready')}</p>
-                        <p className="text-slate-400 text-sm">{t('difficulty')}: {t(difficulty)}</p>
+                  <div className="text-center">
+                    <motion.div
+                      animate={{ rotate: [0, -10, 10, -10, 0] }}
+                      transition={{ duration: 0.5 }}
+                      className="text-7xl mb-4"
+                    >
+                      🐔
+                    </motion.div>
+                    <h3 className="text-2xl font-bold text-white mb-2">{t('prediction_ready')}</h3>
+                    <p className="text-slate-400">{t('difficulty')}: {t(difficulty)}</p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-amber-500/20 rounded-2xl p-6 border-2 border-yellow-500/30">
+                    <div className="text-center mb-4">
+                      <p className="text-yellow-400 font-semibold mb-2">{t('safe_cells')}</p>
+                      <p className="text-white font-bold text-5xl">{safeCells.length}</p>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-xl p-4 max-h-48 overflow-y-auto">
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {safeCells.sort((a, b) => a - b).map((cell) => (
+                          <motion.div
+                            key={cell}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring" }}
+                            className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-bold rounded-lg px-4 py-2 shadow-lg"
+                          >
+                            {cell + 1}
+                          </motion.div>
+                        ))}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-white font-bold text-3xl">{safeCells.length}</p>
-                      <p className="text-slate-400 text-sm">{t('safe_cells')}</p>
+                  </div>
+
+                  <div className="bg-slate-800/30 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <div className="text-xl">ℹ️</div>
+                      <p>Total cells: {gridSizes[difficulty]} • Bones: {bonesCounts[difficulty]}</p>
                     </div>
                   </div>
                 </motion.div>
-              )}
-
-              <div className={`grid gap-2 md:gap-3`} style={{ gridTemplateColumns: `repeat(${getGridCols()}, 1fr)` }}>
-                {Array.from({ length: gridSizes[difficulty] }).map((_, index) => {
-                  const isSafe = isRevealed && safeCells.includes(index);
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: index * 0.02 }}
-                      whileHover={!isRevealed ? { scale: 1.05 } : {}}
-                      className={`
-                        aspect-square rounded-xl transition-all duration-300 relative overflow-hidden
-                        ${isSafe
-                          ? 'bg-gradient-to-br from-yellow-400 via-orange-500 to-amber-600 shadow-[0_0_25px_rgba(251,191,36,0.6)] border-2 border-yellow-300'
-                          : isRevealed
-                          ? 'bg-gradient-to-br from-red-900/50 to-rose-900/50 border-2 border-red-800/50'
-                          : 'bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-700 hover:border-slate-600'
-                        }
-                        flex items-center justify-center
-                      `}
-                    >
-                      {/* Decorative glow for safe cells */}
-                      {isSafe && (
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-                          transition={{ repeat: Infinity, duration: 2 }}
-                          className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-xl"
-                        />
-                      )}
-                      
-                      {isSafe ? (
-                        <motion.div
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{ type: "spring", stiffness: 200, damping: 15, delay: index * 0.02 }}
-                          className="relative z-10 text-3xl md:text-4xl"
-                        >
-                          🐔
-                        </motion.div>
-                      ) : isRevealed ? (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: index * 0.02 }}
-                          className="text-2xl md:text-3xl opacity-70"
-                        >
-                          🦴
-                        </motion.div>
-                      ) : (
-                        <div className="text-slate-600 text-xs font-bold">
-                          {index + 1}
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {!isRevealed && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center text-slate-500 mt-6 text-sm"
-                >
-                  {t('configure_predict')}
-                </motion.p>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="text-7xl mb-4 opacity-50">🐔</div>
+                    <p className="text-slate-500 text-lg">{t('configure_predict')}</p>
+                  </div>
+                </div>
               )}
             </motion.div>
           </div>
