@@ -21,9 +21,7 @@ export default function Layout({ children, currentPageName }) {
     checkAuth();
   }, []);
 
-  const handleLogin = () => {
-    base44.auth.redirectToLogin();
-  };
+
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -114,14 +112,15 @@ export default function Layout({ children, currentPageName }) {
                   {t('profile')}
                 </Link>
               ) : (
-                <Button
-                  onClick={handleLogin}
-                  size="sm"
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold"
-                >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  {t('login')}
-                </Button>
+                <Link to={createPageUrl('Login')}>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold"
+                  >
+                    <LogIn className="w-4 h-4 mr-2" />
+                    {t('login')}
+                  </Button>
+                </Link>
               )}
               
               <LanguageSelector currentLang={language} onLanguageChange={handleLanguageChange} />
@@ -137,9 +136,11 @@ export default function Layout({ children, currentPageName }) {
                   </Button>
                 </Link>
               ) : (
-                <Button onClick={handleLogin} size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
-                  <LogIn className="w-4 h-4" />
-                </Button>
+                <Link to={createPageUrl('Login')}>
+                  <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                    <LogIn className="w-4 h-4" />
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
