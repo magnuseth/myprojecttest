@@ -4,9 +4,14 @@ import { createPageUrl } from './utils';
 import { Gem, LogIn, User } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import LanguageSelector from '@/components/LanguageSelector';
+import { getTranslation } from '@/components/translations';
 
 export default function Layout({ children, currentPageName }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('language') || 'en';
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -20,8 +25,16 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.redirectToLogin();
   };
 
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+    window.dispatchEvent(new CustomEvent('languageChange', { detail: lang }));
+  };
+
+  const t = (key) => getTranslation(language, key);
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20">
       {/* Навигация */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 py-4">
