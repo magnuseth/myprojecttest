@@ -83,7 +83,16 @@ export default function Layout({ children, currentPageName }) {
                 {t('faq')}
               </Link>
               
-              <LanguageSelector currentLang={language} onLanguageChange={handleLanguageChange} />
+              <Link 
+                to={createPageUrl('Mirrors')} 
+                className={`text-sm font-medium transition-colors ${
+                  currentPageName === 'Mirrors' 
+                    ? 'text-emerald-400' 
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {t('mirrors')}
+              </Link>
               
               {isAuthenticated ? (
                 <Link 
@@ -107,6 +116,8 @@ export default function Layout({ children, currentPageName }) {
                   {t('login')}
                 </Button>
               )}
+              
+              <LanguageSelector currentLang={language} onLanguageChange={handleLanguageChange} />
             </div>
           </div>
         </div>

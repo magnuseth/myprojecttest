@@ -11,6 +11,7 @@ import WheelPredictor from './pages/WheelPredictor';
 import FlipPredictor from './pages/FlipPredictor';
 import KenoPredictor from './pages/KenoPredictor';
 import FAQ from './pages/FAQ';
+import Mirrors from './pages/Mirrors';
 import __Layout from './Layout.jsx';
 
 
@@ -28,6 +29,7 @@ export const PAGES = {
     "FlipPredictor": FlipPredictor,
     "KenoPredictor": KenoPredictor,
     "FAQ": FAQ,
+    "Mirrors": Mirrors,
 }
 
 export const pagesConfig = {

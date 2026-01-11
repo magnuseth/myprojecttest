@@ -4,6 +4,7 @@ export const translations = {
     home: 'Home',
     predictors: 'Predictors',
     faq: 'FAQ',
+    mirrors: 'Mirrors',
     profile: 'Profile',
     login: 'Login',
     logout: 'Logout',
@@ -57,13 +58,28 @@ export const translations = {
     
     // Footer
     copyright: '© 2026 Stake Prediction. All rights reserved.',
-    warning: '⚠️ For entertainment purposes. Play responsibly.'
+    warning: '⚠️ For entertainment purposes. Play responsibly.',
+    
+    // Mirrors
+    mirrors_title: 'Stake Mirrors',
+    mirrors_subtitle: 'Available domains for Stake Prediction',
+    mirrors_notice_title: 'Important Notice',
+    mirrors_notice_text: 'Currently, the predictor only works on stake1102.com domain. Other mirrors are being updated and will be available soon.',
+    mirror_status_working: 'Working',
+    mirror_status_update: 'Updating',
+    mirror_online: 'Online & Ready',
+    mirror_update_text: 'This mirror is currently being updated. Check back soon!',
+    mirrors_info_title: 'About Mirrors',
+    mirrors_info_1: 'Always use official Stake mirrors to ensure security',
+    mirrors_info_2: 'Predictor works only on verified working domains',
+    mirrors_info_3: 'Bookmark this page to stay updated on available mirrors'
   },
   
   ru: {
     home: 'Главная',
     predictors: 'Предикторы',
     faq: 'FAQ',
+    mirrors: 'Зеркала',
     profile: 'Профиль',
     login: 'Войти',
     logout: 'Выйти',
@@ -101,7 +117,19 @@ export const translations = {
     predict: 'Предсказать',
     reset: 'Сбросить',
     copyright: '© 2026 Stake Prediction. Все права защищены.',
-    warning: '⚠️ Для развлекательных целей. Играйте ответственно.'
+    warning: '⚠️ Для развлекательных целей. Играйте ответственно.',
+    mirrors_title: 'Зеркала Stake',
+    mirrors_subtitle: 'Доступные домены для Stake Prediction',
+    mirrors_notice_title: 'Важное уведомление',
+    mirrors_notice_text: 'На данный момент предиктор работает только на домене stake1102.com. Остальные зеркала обновляются и скоро будут доступны.',
+    mirror_status_working: 'Работает',
+    mirror_status_update: 'Обновление',
+    mirror_online: 'Онлайн и готов',
+    mirror_update_text: 'Это зеркало сейчас обновляется. Скоро будет доступно!',
+    mirrors_info_title: 'О зеркалах',
+    mirrors_info_1: 'Всегда используйте официальные зеркала Stake для безопасности',
+    mirrors_info_2: 'Предиктор работает только на проверенных рабочих доменах',
+    mirrors_info_3: 'Добавьте эту страницу в закладки, чтобы быть в курсе доступных зеркал'
   },
   
   es: {
