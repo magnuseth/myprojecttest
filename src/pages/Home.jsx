@@ -130,38 +130,20 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center items-center"
               >
-                {isAuthenticated ? (
-                  <>
-                    <Link to={createPageUrl('Predictor')}>
-                      <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
-                        {t('start_prediction')}
-                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </Link>
-                    <Link to={createPageUrl('FAQ')}>
-                      <Button variant="outline" className="border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
-                        <HelpCircle className="mr-2 w-5 h-5" />
-                        {t('learn_more')}
-                      </Button>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Button 
-                      onClick={() => base44.auth.redirectToLogin(window.location.origin + createPageUrl('Predictor'))}
-                      className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group"
-                    >
-                      <LogIn className="mr-2 w-5 h-5" />
-                      {t('login_register')}
-                    </Button>
-                    <Link to={createPageUrl('FAQ')}>
-                      <Button variant="outline" className="border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
-                        <HelpCircle className="mr-2 w-5 h-5" />
-                        {t('learn_more')}
-                      </Button>
-                    </Link>
-                  </>
-                )}
+                <Button 
+                  onClick={() => base44.auth.redirectToLogin(window.location.origin + createPageUrl('Predictor'))}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group"
+                >
+                  <LogIn className="mr-2 w-5 h-5" />
+                  {t('start_prediction')}
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Link to={createPageUrl('FAQ')}>
+                  <Button variant="outline" className="border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
+                    <HelpCircle className="mr-2 w-5 h-5" />
+                    {t('learn_more')}
+                  </Button>
+                </Link>
               </motion.div>
             </motion.div>
 
@@ -303,27 +285,19 @@ export default function Home() {
             >
               <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-6" />
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Готовы начать?
+                {t('ready_start')}
               </h2>
               <p className="text-slate-400 text-xl mb-8">
-                Присоединяйтесь к тысячам пользователей уже сейчас
+                {t('join_thousands')}
               </p>
-              {isAuthenticated ? (
-                <Link to={createPageUrl('Predictor')}>
-                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-10 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
-                    Запустить предиктор
-                    <Sparkles className="ml-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
-                  </Button>
-                </Link>
-              ) : (
-                <Button 
-                  onClick={() => base44.auth.redirectToLogin(window.location.origin + createPageUrl('Predictor'))}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-10 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group"
-                >
-                  <LogIn className="mr-2 w-5 h-5" />
-                  Начать бесплатно
-                </Button>
-              )}
+              <Button 
+                onClick={() => base44.auth.redirectToLogin(window.location.origin + createPageUrl('Predictor'))}
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-10 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group"
+              >
+                <LogIn className="mr-2 w-5 h-5" />
+                {t('run_predictor')}
+                <Sparkles className="ml-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
+              </Button>
             </motion.div>
           </div>
         </section>
