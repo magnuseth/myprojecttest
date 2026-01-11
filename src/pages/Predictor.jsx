@@ -1,98 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import MineCell from '../components/mines/MineCell';
-import ControlPanel from '../components/mines/ControlPanel';
-import { Sparkles } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { createPageUrl } from '../utils';
+import { Gem, Zap, Target, Dices, TrendingUp, ChevronRight, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { base44 } from '@/api/base44Client';
 
 export default function Predictor() {
-  const [mineCount, setMineCount] = useState(3);
-  const [safeCells, setSafeCells] = useState([]);
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [clientSeed, setClientSeed] = useState('');
-  const [serverSeed, setServerSeed] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const totalCells = 25;
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authenticated = await base44.auth.isAuthenticated();
+      setIsAuthenticated(authenticated);
+      
+      if (!authenticated) {
+        base44.auth.redirectToLogin(window.location.href);
+      }
+      
+      setIsLoading(false);
+    };
+    checkAuth();
+  }, []);
 
-  // Функция для воспроизведения звука
-  const playPredictSound = () => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Создаём серию звуков для эффекта
-    const times = [0, 0.1, 0.2];
-    const frequencies = [800, 1000, 1200];
-    
-    times.forEach((time, index) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequencies[index];
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + time);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + time + 0.3);
-      
-      oscillator.start(audioContext.currentTime + time);
-      oscillator.stop(audioContext.currentTime + time + 0.3);
-    });
-  };
-
-  // Простая хеш-функция для seed
-  const hashSeed = (str) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
+  const predictors = [
+    {
+      id: 'mines',
+      name: 'Mines',
+      description: 'Предсказание безопасных ячеек на поле с минами',
+      icon: Gem,
+      color: 'from-emerald-500 to-teal-500',
+      bgGlow: 'bg-emerald-500/10',
+      page: 'MinesPredictor'
+    },
+    {
+      id: 'crash',
+      name: 'Crash',
+      description: 'Предсказание точки краха и оптимальный момент выхода',
+      icon: TrendingUp,
+      color: 'from-orange-500 to-red-500',
+      bgGlow: 'bg-orange-500/10',
+      page: 'CrashPredictor'
+    },
+    {
+      id: 'chicken',
+      name: 'Chicken',
+      description: 'Предсказание безопасных клеток с выбором сложности',
+      icon: Target,
+      color: 'from-yellow-500 to-orange-500',
+      bgGlow: 'bg-yellow-500/10',
+      page: 'ChickenPredictor'
+    },
+    {
+      id: 'dice',
+      name: 'Dice',
+      description: 'Предсказание результата броска кубика',
+      icon: Dices,
+      color: 'from-blue-500 to-cyan-500',
+      bgGlow: 'bg-blue-500/10',
+      page: 'DicePredictor'
+    },
+    {
+      id: 'limbo',
+      name: 'Limbo',
+      description: 'Предсказание множителя для игры Limbo',
+      icon: Zap,
+      color: 'from-purple-500 to-pink-500',
+      bgGlow: 'bg-purple-500/10',
+      page: 'LimboPredictor'
     }
-    return Math.abs(hash);
-  };
+  ];
 
-  // Генератор псевдослучайных чисел на основе seed
-  const seededRandom = (seed) => {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-white text-xl">Загрузка...</div>
+      </div>
+    );
+  }
 
-  const handlePredict = () => {
-    // Воспроизводим звук
-    playPredictSound();
-    
-    // Генерируем безопасные ячейки
-    const safeCount = totalCells - mineCount;
-    const allCells = Array.from({ length: totalCells }, (_, i) => i);
-    
-    // Если указаны seeds, используем их для генерации
-    if (clientSeed && serverSeed) {
-      const combinedSeed = hashSeed(clientSeed + serverSeed);
-      const shuffled = allCells.sort((a, b) => {
-        return seededRandom(combinedSeed + a) - seededRandom(combinedSeed + b);
-      });
-      const safe = shuffled.slice(0, safeCount);
-      setSafeCells(safe);
-    } else {
-      // Иначе случайная генерация
-      const shuffled = allCells.sort(() => Math.random() - 0.5);
-      const safe = shuffled.slice(0, safeCount);
-      setSafeCells(safe);
-    }
-    
-    setIsRevealed(true);
-  };
-
-  const handleReset = () => {
-    setSafeCells([]);
-    setIsRevealed(false);
-  };
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
       {/* Фоновые эффекты */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 right-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto">
@@ -100,124 +99,77 @@ export default function Predictor() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-12"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-            Mines Predictor
+            Выберите предиктор
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <Sparkles className="w-5 h-5 text-emerald-400" />
-            Генератор безопасных ячеек
+            Профессиональные инструменты для предсказаний
           </p>
         </motion.div>
 
-        {/* Основной контент */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Игровое поле */}
-          <div className="lg:col-span-2">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 border-2 border-slate-700 shadow-2xl"
-            >
-              {/* Статистика сверху */}
-              {isRevealed && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-xl p-4 border border-emerald-500/30"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-emerald-400 font-semibold">
-                      Предсказание готово
-                    </span>
-                    <span className="text-white font-bold">
-                      {safeCells.length} безопасных ячеек
-                    </span>
+        {/* Сетка предикторов */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {predictors.map((predictor, index) => {
+            const Icon = predictor.icon;
+            return (
+              <motion.div
+                key={predictor.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Link to={createPageUrl(predictor.page)}>
+                  <div className="group relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border-2 border-slate-700 hover:border-slate-600 transition-all duration-300 hover:scale-105 cursor-pointer overflow-hidden">
+                    {/* Фоновое свечение */}
+                    <div className={`absolute inset-0 ${predictor.bgGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    
+                    {/* Контент */}
+                    <div className="relative z-10">
+                      {/* Иконка */}
+                      <div className={`bg-gradient-to-br ${predictor.color} w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+
+                      {/* Название */}
+                      <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+                        {predictor.name}
+                      </h3>
+
+                      {/* Описание */}
+                      <p className="text-slate-400 mb-6 leading-relaxed">
+                        {predictor.description}
+                      </p>
+
+                      {/* Кнопка */}
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-semibold bg-gradient-to-r ${predictor.color} bg-clip-text text-transparent`}>
+                          Запустить
+                        </span>
+                        <ChevronRight className={`w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform`} />
+                      </div>
+                    </div>
+
+                    {/* Декоративные элементы */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -translate-y-16 translate-x-16" />
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-white/5 to-transparent rounded-full translate-y-12 -translate-x-12" />
                   </div>
-                </motion.div>
-              )}
-
-              {/* Сетка 5x5 */}
-              <div className="grid grid-cols-5 gap-2 md:gap-3 aspect-square">
-                {Array.from({ length: totalCells }).map((_, index) => (
-                  <MineCell
-                    key={index}
-                    index={index}
-                    isSafe={safeCells.includes(index)}
-                    isRevealed={isRevealed}
-                  />
-                ))}
-              </div>
-
-              {/* Подсказка */}
-              {!isRevealed && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center text-slate-500 mt-6 text-sm"
-                >
-                  Настройте параметры и нажмите "Предсказать" →
-                </motion.p>
-              )}
-            </motion.div>
-          </div>
-
-          {/* Панель управления */}
-          <div className="lg:col-span-1">
-            <ControlPanel
-              mineCount={mineCount}
-              onMineCountChange={setMineCount}
-              onPredict={handlePredict}
-              onReset={handleReset}
-              isRevealed={isRevealed}
-              clientSeed={clientSeed}
-              serverSeed={serverSeed}
-              onClientSeedChange={setClientSeed}
-              onServerSeedChange={setServerSeed}
-            />
-
-            {/* Дополнительная информация */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mt-6 bg-slate-900/50 rounded-xl p-6 border border-slate-800"
-            >
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" />
-                Как это работает?
-              </h3>
-              <ul className="space-y-2 text-slate-400 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 mt-1">•</span>
-                  <span>Выберите количество мин на поле</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 mt-1">•</span>
-                  <span>Нажмите "Предсказать" для генерации</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 mt-1">•</span>
-                  <span>Зелёные ячейки — безопасные позиции</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 mt-1">•</span>
-                  <span>Используйте "Сбросить" для новой попытки</span>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
 
-        {/* Футер */}
+        {/* Информация */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-12 text-slate-600 text-sm"
+          transition={{ delay: 0.6 }}
+          className="mt-12 text-center text-slate-600 text-sm"
         >
-          <p>⚠️ Для развлекательных целей. Результаты генерируются случайно.</p>
+          <p>💡 Все предикторы используют провабли фейр систему с поддержкой custom seeds</p>
         </motion.div>
       </div>
     </div>
