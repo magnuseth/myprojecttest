@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings as SettingsIcon, CreditCard, TrendingUp, LogOut } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { User, Zap, TrendingUp, LogOut, ShoppingCart, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ProfileSection from '../components/settings/ProfileSection';
-import PlanCard from '../components/settings/PlanCard';
-import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '../utils';
 import { getTranslation } from '@/components/translations';
 
 export default function Settings() {
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
 
-  // Загрузка пользователя
   useEffect(() => {
     const loadUser = async () => {
       try {
         const userData = await base44.auth.me();
         setUser(userData);
       } catch (error) {
-        console.error('Ошибка загрузки пользователя:', error);
+        console.error('Error loading user:', error);
       }
     };
     loadUser();
@@ -35,7 +33,6 @@ export default function Settings() {
 
   const t = (key) => getTranslation(language, key);
 
-  // Загрузка подписки
   const { data: subscriptions = [] } = useQuery({
     queryKey: ['subscription', user?.email],
     queryFn: () => base44.entities.Subscription.filter({ user_email: user?.email }),
@@ -44,101 +41,43 @@ export default function Settings() {
 
   const currentSubscription = subscriptions[0];
 
-  // Планы
-  const getPlans = () => [
-    {
-      id: 'free',
-      name: t('plan_free'),
-      price: 0,
-      description: t('perfect_start'),
-      color: 'from-slate-600 to-slate-700',
-      features: [
-        `10 ${t('predictions_per_day')}`,
-        t('basic_settings'),
-        t('standard_support')
-      ]
-    },
+  const packs = [
     {
       id: 'basic',
-      name: t('plan_basic'),
-      price: 9,
-      description: t('regular_use'),
-      color: 'from-blue-500 to-blue-600',
-      popular: false,
-      features: [
-        `100 ${t('predictions_per_day')}`,
-        t('all_settings'),
-        t('priority_support'),
-        t('usage_statistics')
-      ]
+      name: t('starter_pack'),
+      price: 249,
+      attempts: 50,
+      color: 'from-blue-500 to-cyan-500',
+      bgGlow: 'bg-blue-500/10',
+      icon: Zap,
+      description: t('one_time_purchase')
     },
     {
       id: 'pro',
-      name: t('plan_pro'),
-      price: 29,
-      description: t('for_professionals'),
-      color: 'from-purple-500 to-purple-600',
+      name: t('professional_pack'),
+      price: 999,
+      attempts: 250,
+      color: 'from-purple-500 to-pink-500',
+      bgGlow: 'bg-purple-500/10',
+      icon: TrendingUp,
       popular: true,
-      features: [
-        `500 ${t('predictions_per_day')}`,
-        t('all_basic_features'),
-        t('extended_analytics'),
-        t('api_access'),
-        t('vip_support')
-      ]
+      description: t('one_time_purchase')
     },
     {
-      id: 'unlimited',
-      name: t('plan_unlimited'),
-      price: 99,
-      description: t('no_limits'),
+      id: 'high_roller',
+      name: t('high_roller_pack'),
+      price: 9999,
+      attempts: 1000,
       color: 'from-emerald-500 to-teal-500',
-      features: [
-        t('unlimited_predictions'),
-        t('all_pro_features'),
-        t('ip_whitelist'),
-        t('personal_manager'),
-        t('custom_integrations')
-      ]
+      bgGlow: 'bg-emerald-500/10',
+      icon: Sparkles,
+      description: t('one_time_purchase')
     }
   ];
 
-  // Обновление плана
-  const updatePlanMutation = useMutation({
-    mutationFn: async (planId) => {
-      if (currentSubscription?.plan === planId) {
-        return;
-      }
-      
-      const limits = {
-        free: 10,
-        basic: 100,
-        pro: 500,
-        unlimited: 999999
-      };
-
-      if (currentSubscription) {
-        return base44.entities.Subscription.update(currentSubscription.id, {
-          plan: planId,
-          predictions_limit: limits[planId],
-          predictions_used: 0,
-          is_active: true
-        });
-      } else {
-        return base44.entities.Subscription.create({
-          user_email: user.email,
-          plan: planId,
-          predictions_limit: limits[planId],
-          predictions_used: 0,
-          is_active: true
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscription'] });
-      toast.success(t('success'));
-    },
-  });
+  const handleBuyPack = (pack) => {
+    navigate(createPageUrl(`CryptoPayment?pack=${pack.id}&price=${pack.price}&attempts=${pack.attempts}`));
+  };
 
   const handleLogout = () => {
     base44.auth.logout();
@@ -146,7 +85,7 @@ export default function Settings() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-white">{t('loading')}</div>
       </div>
     );
@@ -155,63 +94,87 @@ export default function Settings() {
   return (
     <div className="pb-12 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Заголовок */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 flex items-center gap-3">
-            <SettingsIcon className="w-10 h-10 text-emerald-400" />
-            {t('profile_settings')}
+            <User className="w-10 h-10 text-emerald-400" />
+            {t('profile_title')}
           </h1>
-          <p className="text-slate-400 text-lg">{t('manage_profile')}</p>
+          <p className="text-slate-400 text-lg">{t('manage_account')}</p>
         </motion.div>
 
-        {/* Статус подписки */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl p-6 border border-emerald-500/30 mb-8"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h3 className="text-white font-bold text-xl mb-1">
-                {t('current_plan')}: <span className="text-emerald-400">{currentSubscription?.plan?.toUpperCase() || 'FREE'}</span>
-              </h3>
-              <p className="text-slate-300">
-                {t('used')}: {currentSubscription?.predictions_used || 0} / {currentSubscription?.predictions_limit || 10}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-400" />
-              <span className="text-white font-semibold">
-                {currentSubscription?.predictions_limit && currentSubscription.predictions_used 
-                  ? Math.round((currentSubscription.predictions_used / currentSubscription.predictions_limit) * 100)
-                  : 0}% {t('used_percentage')}
-              </span>
-            </div>
-          </div>
-        </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Profile Section */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* User Info Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border-2 border-slate-700"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 w-16 h-16 rounded-xl flex items-center justify-center">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">{user.full_name || 'User'}</h3>
+                  <p className="text-slate-400 text-sm">{user.email}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center justify-between py-2 px-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400 text-sm">{t('email_address')}</span>
+                  <span className="text-white text-sm font-medium">{user.email}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 px-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400 text-sm">Role</span>
+                  <span className="text-emerald-400 text-sm font-medium capitalize">{user.role}</span>
+                </div>
+              </div>
+            </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Профиль */}
-          <div className="lg:col-span-1">
-            <ProfileSection 
-              user={user} 
-              language={language}
-              onUpdate={async () => {
-                const userData = await base44.auth.me();
-                setUser(userData);
-              }} 
-            />
+            {/* Attempts Balance */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl p-6 border-2 border-emerald-500/30"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <Zap className="w-6 h-6 text-emerald-400" />
+                <h3 className="text-white font-bold text-lg">{t('attempts_balance')}</h3>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-slate-300 text-sm">{t('attempts_used')}</span>
+                  <span className="text-3xl font-bold text-white">
+                    {currentSubscription?.predictions_used || 0}
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${currentSubscription ? (currentSubscription.predictions_used / currentSubscription.predictions_limit) * 100 : 0}%` }}
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                  />
+                </div>
+                <p className="text-slate-400 text-xs">
+                  {currentSubscription?.predictions_limit || 0} {t('attempts_count')} {t('total_cells')}
+                </p>
+              </div>
+            </motion.div>
 
-            {/* Кнопка выхода */}
+            {/* Logout Button */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="mt-6"
             >
               <Button
                 onClick={handleLogout}
@@ -224,42 +187,74 @@ export default function Settings() {
             </motion.div>
           </div>
 
-          {/* Планы */}
+          {/* Buy Attempts Section */}
           <div className="lg:col-span-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border-2 border-slate-700"
             >
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <CreditCard className="w-6 h-6 text-emerald-400" />
-                {t('plans_subscription')}
-              </h2>
+              <div className="flex items-center gap-3 mb-2">
+                <ShoppingCart className="w-6 h-6 text-emerald-400" />
+                <h2 className="text-2xl font-bold text-white">{t('buy_attempts')}</h2>
+              </div>
+              <p className="text-slate-400 mb-8">{t('purchase_attempts')}</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {getPlans().map((plan) => (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    language={language}
-                    isCurrentPlan={currentSubscription?.plan === plan.id || (!currentSubscription && plan.id === 'free')}
-                    onSelect={(planId) => updatePlanMutation.mutate(planId)}
-                  />
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {packs.map((pack, index) => {
+                  const Icon = pack.icon;
+                  return (
+                    <motion.div
+                      key={pack.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 border-2 ${
+                        pack.popular ? 'border-purple-500/50 ring-2 ring-purple-500/20' : 'border-slate-700'
+                      } hover:scale-105 transition-all duration-300 overflow-hidden group`}
+                    >
+                      {pack.popular && (
+                        <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                          POPULAR
+                        </div>
+                      )}
+
+                      <div className={`absolute inset-0 ${pack.bgGlow} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                      
+                      <div className="relative z-10">
+                        <div className={`bg-gradient-to-br ${pack.color} w-12 h-12 rounded-xl flex items-center justify-center mb-4`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        
+                        <h3 className="text-white font-bold text-xl mb-2">{pack.name}</h3>
+                        <p className="text-slate-400 text-sm mb-4">{pack.description}</p>
+                        
+                        <div className="mb-6">
+                          <div className="flex items-baseline gap-1 mb-2">
+                            <span className="text-4xl font-bold text-white">${pack.price}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-emerald-400" />
+                            <span className="text-emerald-400 font-semibold">
+                              {pack.attempts} {t('attempts_count')}
+                            </span>
+                          </div>
+                        </div>
+
+                        <Button
+                          onClick={() => handleBuyPack(pack)}
+                          className={`w-full bg-gradient-to-r ${pack.color} hover:opacity-90 text-white font-bold py-6 rounded-xl shadow-lg transition-all`}
+                        >
+                          {t('buy_now')}
+                        </Button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
             </motion.div>
           </div>
         </div>
-
-        {/* Информация */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-4 border border-emerald-500/30 text-center"
-        >
-          <p className="text-emerald-400 text-sm font-medium">💡 {t('daily_reset')}</p>
-        </motion.div>
       </div>
     </div>
   );
