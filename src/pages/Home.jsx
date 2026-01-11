@@ -69,8 +69,8 @@ export default function Home() {
   ];
 
   return (
-    <div className="relative">
-        {/* Hero секция */}
+    <>
+      {/* Hero секция */}
         <section className="px-4 pt-20 pb-32 md:pt-32 md:pb-40">
           <div className="max-w-6xl mx-auto text-center">
             <motion.div
@@ -338,7 +338,6 @@ export default function Home() {
             <p className="mt-2">{t('warning')}</p>
           </div>
         </footer>
-      </div>
-    </div>
+    </>
   );
 }
