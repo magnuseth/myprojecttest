@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UserPlus, Mail, Lock, User, ArrowLeft, Gem, CheckCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, ArrowLeft, Gem, CheckCircle, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 export default function Register() {
@@ -12,6 +12,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [promoCode, setPromoCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,11 +38,23 @@ export default function Register() {
       // Используем встроенную систему регистрации Base44
       await base44.auth.register(email, password, { full_name: fullName });
       
+      // Определяем план на основе промокода
+      let plan = 'free';
+      let limit = 10;
+      
+      if (promoCode.toLowerCase() === 'premium') {
+        plan = 'pro';
+        limit = 200;
+      } else if (promoCode.toLowerCase() === 'starter') {
+        plan = 'basic';
+        limit = 50;
+      }
+      
       // Создаём подписку для нового пользователя
       await base44.entities.Subscription.create({
         user_email: email,
-        plan: 'free',
-        predictions_limit: 10,
+        plan: plan,
+        predictions_limit: limit,
         predictions_used: 0,
         is_active: true
       });
@@ -163,6 +176,24 @@ export default function Register() {
                 required
                 className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
               />
+            </div>
+
+            {/* Промокод */}
+            <div>
+              <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                Промокод (необязательно)
+              </label>
+              <Input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="Введите промокод"
+                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-yellow-500 focus:ring-yellow-500/20"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Есть промокод? Получите бонус к подписке!
+              </p>
             </div>
 
             {/* Ошибка */}

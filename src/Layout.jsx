@@ -32,7 +32,7 @@ export default function Layout({ children, currentPageName }) {
                 <Gem className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                Mines Predictor
+                Stake Prediction
               </span>
             </Link>
 
@@ -56,7 +56,18 @@ export default function Layout({ children, currentPageName }) {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Предиктор
+                Предикторы
+              </Link>
+              
+              <Link 
+                to={createPageUrl('FAQ')} 
+                className={`text-sm font-medium transition-colors ${
+                  currentPageName === 'FAQ' 
+                    ? 'text-emerald-400' 
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                FAQ
               </Link>
               
               {isAuthenticated ? (
