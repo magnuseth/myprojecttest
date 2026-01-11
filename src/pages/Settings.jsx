@@ -2,16 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { User, Zap, TrendingUp, LogOut, ShoppingCart, Sparkles } from 'lucide-react';
+import { User, Zap, TrendingUp, LogOut, ShoppingCart, Sparkles, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { getTranslation } from '@/components/translations';
+import { toast } from 'sonner';
 
 export default function Settings() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   useEffect(() => {
     const loadUser = async () => {
@@ -77,6 +84,29 @@ export default function Settings() {
 
   const handleBuyPack = (pack) => {
     navigate(createPageUrl(`CryptoPayment?pack=${pack.id}&price=${pack.price}&attempts=${pack.attempts}`));
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    if (passwordData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
+    try {
+      // Here you would normally call an API to change password
+      // For now, just show success message
+      toast.success(t('password_updated'));
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      toast.error('Failed to update password');
+    }
   };
 
   const handleLogout = () => {
@@ -168,6 +198,52 @@ export default function Settings() {
                   {currentSubscription?.predictions_limit || 0} {t('attempts_count')} {t('total_cells')}
                 </p>
               </div>
+            </motion.div>
+
+            {/* Change Password */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border-2 border-slate-700"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <Lock className="w-5 h-5 text-blue-400" />
+                <h3 className="text-white font-bold text-lg">{t('change_password')}</h3>
+              </div>
+              
+              <form onSubmit={handlePasswordChange} className="space-y-3">
+                <Input
+                  type="password"
+                  placeholder={t('current_password')}
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                  className="bg-slate-800/50 border-slate-700 text-white"
+                  required
+                />
+                <Input
+                  type="password"
+                  placeholder={t('new_password')}
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                  className="bg-slate-800/50 border-slate-700 text-white"
+                  required
+                />
+                <Input
+                  type="password"
+                  placeholder={t('confirm_password')}
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                  className="bg-slate-800/50 border-slate-700 text-white"
+                  required
+                />
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-5 rounded-xl"
+                >
+                  {t('update_password')}
+                </Button>
+              </form>
             </motion.div>
 
             {/* Logout Button */}

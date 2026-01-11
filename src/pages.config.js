@@ -1,6 +1,7 @@
 import Blowjow from './pages/Blowjow';
 import ChickenPredictor from './pages/ChickenPredictor';
 import CrashPredictor from './pages/CrashPredictor';
+import CryptoPayment from './pages/CryptoPayment';
 import DicePredictor from './pages/DicePredictor';
 import FAQ from './pages/FAQ';
 import FlipPredictor from './pages/FlipPredictor';
@@ -13,7 +14,6 @@ import Predictor from './pages/Predictor';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import WheelPredictor from './pages/WheelPredictor';
-import CryptoPayment from './pages/CryptoPayment';
 import __Layout from './Layout.jsx';
 
 
@@ -21,6 +21,7 @@ export const PAGES = {
     "Blowjow": Blowjow,
     "ChickenPredictor": ChickenPredictor,
     "CrashPredictor": CrashPredictor,
+    "CryptoPayment": CryptoPayment,
     "DicePredictor": DicePredictor,
     "FAQ": FAQ,
     "FlipPredictor": FlipPredictor,
@@ -33,7 +34,6 @@ export const PAGES = {
     "Register": Register,
     "Settings": Settings,
     "WheelPredictor": WheelPredictor,
-    "CryptoPayment": CryptoPayment,
 }
 
 export const pagesConfig = {
