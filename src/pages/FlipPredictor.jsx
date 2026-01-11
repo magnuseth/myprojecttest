@@ -6,14 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Gem, ArrowLeft, Sparkles, RotateCcw, Hash } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PredictionCounter from '../components/PredictionCounter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTranslation } from '@/components/translations';
 
 export default function FlipPredictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [clientSeed, setClientSeed] = useState('');
   const [serverSeed, setServerSeed] = useState('');
   const [prediction, setPrediction] = useState(null);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -22,12 +29,45 @@ export default function FlipPredictor() {
       
       if (!authenticated) {
         base44.auth.redirectToLogin(window.location.href);
+      } else {
+        const userData = await base44.auth.me();
+        setUser(userData);
       }
       
       setIsLoading(false);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const subs = await base44.entities.Subscription.filter({ user_email: user.email });
+      return subs[0] || null;
+    },
+    enabled: !!user?.email
+  });
+
+  const updateSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      if (!subscription) return;
+      await base44.entities.Subscription.update(subscription.id, {
+        predictions_used: subscription.predictions_used + 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    }
+  });
+
+  const t = (key) => getTranslation(language, key);
 
   const hashSeed = (str) => {
     let hash = 0;
@@ -45,11 +85,17 @@ export default function FlipPredictor() {
   };
 
   const handlePredict = async () => {
+    if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
+      alert(t('remaining_none'));
+      return;
+    }
+    
     if (!clientSeed || !serverSeed) {
-      alert('Пожалуйста, введите оба seed');
+      alert(t('enter_seeds_predict'));
       return;
     }
 
+    updateSubscriptionMutation.mutate();
     setIsFlipping(true);
     
     // Анимация переворота монеты
@@ -76,7 +122,7 @@ export default function FlipPredictor() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+        <div className="text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -86,7 +132,7 @@ export default function FlipPredictor() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 pb-12">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-slate-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gray-500/10 rounded-full blur-3xl" />
@@ -95,7 +141,7 @@ export default function FlipPredictor() {
       <div className="relative max-w-5xl mx-auto">
         <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Назад к выбору</span>
+          <span>{t('back_to_selection')}</span>
         </Link>
 
         <motion.div
@@ -104,13 +150,23 @@ export default function FlipPredictor() {
           className="text-center mb-8"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-slate-400 via-gray-400 to-zinc-400 bg-clip-text text-transparent">
-            Flip Predictor
+            {t('flip_predictor')}
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <Gem className="w-5 h-5 text-slate-400" />
-            Предсказание подбрасывания монеты
+            {t('flip_desc')}
           </p>
         </motion.div>
+
+        {subscription && (
+          <div className="mb-8">
+            <PredictionCounter 
+              used={subscription.predictions_used} 
+              limit={subscription.predictions_limit}
+              language={language}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Результат */}
@@ -132,7 +188,7 @@ export default function FlipPredictor() {
             ) : prediction ? (
               <div className="space-y-6">
                 <div className="text-center">
-                  <div className="text-slate-400 text-sm mb-4">Результат</div>
+                  <div className="text-slate-400 text-sm mb-4">{t('result')}</div>
                   <motion.div
                     initial={{ scale: 0, rotateY: 0 }}
                     animate={{ scale: 1, rotateY: 360 }}
@@ -146,20 +202,17 @@ export default function FlipPredictor() {
                     {prediction.result === 'heads' ? '👑' : '🎯'}
                   </motion.div>
                   <div className="text-4xl font-bold text-white mb-2">
-                    {prediction.result === 'heads' ? 'HEADS' : 'TAILS'}
-                  </div>
-                  <div className="text-slate-400">
-                    {prediction.result === 'heads' ? 'Орёл' : 'Решка'}
+                    {prediction.result === 'heads' ? t('heads') : t('tails')}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <div className="text-slate-300 text-sm mb-1">Вероятность</div>
+                    <div className="text-slate-300 text-sm mb-1">{t('probability')}</div>
                     <div className="text-2xl font-bold text-slate-400">{prediction.probability}%</div>
                   </div>
                   <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <div className="text-slate-300 text-sm mb-1">Уверенность</div>
+                    <div className="text-slate-300 text-sm mb-1">{t('confidence')}</div>
                     <div className="text-2xl font-bold text-slate-400">{prediction.confidence}%</div>
                   </div>
                 </div>
@@ -167,13 +220,10 @@ export default function FlipPredictor() {
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                   <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-yellow-400" />
-                    Совет
+                    {t('recommendations')}
                   </h3>
                   <p className="text-slate-400 text-sm">
-                    {prediction.result === 'heads'
-                      ? 'Орёл выпадает чаще при этих seeds'
-                      : 'Решка - безопасная ставка для этой комбинации'
-                    }
+                    {prediction.result === 'heads' ? t('heads') : t('tails')}
                   </p>
                 </div>
               </div>
@@ -183,7 +233,7 @@ export default function FlipPredictor() {
                   <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-6xl opacity-30">
                     💰
                   </div>
-                  <p>Введите seeds и нажмите "Подбросить"</p>
+                  <p>{t('enter_seeds_predict')}</p>
                 </div>
               </div>
             )}
@@ -195,18 +245,18 @@ export default function FlipPredictor() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border-2 border-slate-700 shadow-2xl"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Параметры</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('parameters')}</h2>
 
             <div className="space-y-6">
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-slate-400" />
-                  Client Seed
+                  {t('client_seed')}
                 </label>
                 <Input
                   value={clientSeed}
                   onChange={(e) => setClientSeed(e.target.value)}
-                  placeholder="Введите client seed"
+                  placeholder={t('enter_client_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-500 focus:ring-slate-500/20"
                 />
               </div>
@@ -214,23 +264,14 @@ export default function FlipPredictor() {
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-gray-400" />
-                  Server Seed
+                  {t('server_seed')}
                 </label>
                 <Input
                   value={serverSeed}
                   onChange={(e) => setServerSeed(e.target.value)}
-                  placeholder="Введите server seed"
+                  placeholder={t('enter_server_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-gray-500 focus:ring-gray-500/20"
                 />
-              </div>
-
-              <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                <h3 className="text-white font-semibold mb-2 text-sm">О игре</h3>
-                <ul className="space-y-1 text-slate-400 text-xs">
-                  <li>• 50/50 шанс на выигрыш</li>
-                  <li>• Heads (Орёл) или Tails (Решка)</li>
-                  <li>• Простая и честная игра</li>
-                </ul>
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -240,7 +281,7 @@ export default function FlipPredictor() {
                   className="flex-1 bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white font-semibold py-6 rounded-xl disabled:opacity-50"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
-                  {isFlipping ? 'Подбрасываем...' : 'Подбросить'}
+                  {isFlipping ? t('loading') : t('predict')}
                 </Button>
 
                 {prediction && !isFlipping && (
@@ -249,7 +290,7 @@ export default function FlipPredictor() {
                     className="flex-1 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-semibold py-6 rounded-xl"
                   >
                     <RotateCcw className="w-5 h-5 mr-2" />
-                    Сбросить
+                    {t('reset')}
                   </Button>
                 )}
               </div>

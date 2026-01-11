@@ -27,26 +27,26 @@ export default function Home() {
 
   const t = (key) => getTranslation(language, key);
 
-  const features = [
+  const getFeatures = () => [
     {
       icon: Zap,
-      title: 'Молниеносная скорость',
-      description: 'Мгновенная генерация предсказаний без задержек'
+      title: t('lightning_speed'),
+      description: t('lightning_desc')
     },
     {
       icon: Shield,
-      title: 'Провабли фейр',
-      description: 'Используйте собственные seeds для проверяемых результатов'
+      title: t('provably_fair'),
+      description: t('provably_desc')
     },
     {
       icon: TrendingUp,
-      title: 'Высокая точность',
-      description: 'Алгоритм с оптимизированной генерацией безопасных зон'
+      title: t('high_accuracy'),
+      description: t('accuracy_desc')
     },
     {
       icon: Gem,
-      title: '8 игр доступно',
-      description: 'Mines, Crash, Chicken, Dice, Limbo, Wheel, Flip, Keno'
+      title: t('games_available'),
+      description: t('games_desc')
     }
   ];
 
@@ -69,7 +69,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 -mt-20 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Фоновые эффекты */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
@@ -182,10 +182,10 @@ export default function Home() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                Доступные игры
+                {t('available_games')}
               </h2>
               <p className="text-slate-400 text-lg">
-                8 популярных игр Stake с AI предсказанием
+                {t('ai_predictions')}
               </p>
             </motion.div>
 
@@ -218,15 +218,15 @@ export default function Home() {
               className="text-center mb-16"
             >
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                Почему выбирают нас?
+                {t('why_us')}
               </h2>
               <p className="text-slate-400 text-lg">
-                Профессиональные инструменты для максимальной эффективности
+                {t('professional_tools')}
               </p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {features.map((feature, index) => (
+              {getFeatures().map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -257,14 +257,13 @@ export default function Home() {
             >
               <Shield className="w-16 h-16 text-emerald-400 mx-auto mb-6" />
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                100% Провабли фейр
+                {t('provably_fair')}
               </h2>
               <p className="text-slate-300 text-lg mb-6 leading-relaxed">
-                Полная прозрачность генерации. Используйте собственные client и server seeds 
-                для проверяемых результатов. Каждое предсказание можно воспроизвести.
+                {t('provably_desc')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                {['Открытый алгоритм', 'Проверяемость', 'Честность'].map((item, index) => (
+                {[t('feature_provably_fair'), t('feature_custom_seeds'), t('feature_instant')].map((item, index) => (
                   <div key={index} className="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-emerald-400" />
                     <span className="text-white font-medium">{item}</span>
@@ -306,8 +305,8 @@ export default function Home() {
         <section className="px-4 py-12 border-t border-slate-800">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-white mb-2">Присоединяйтесь к нашему сообществу</h3>
-              <p className="text-slate-400">Получайте обновления и общайтесь с другими пользователями</p>
+              <h3 className="text-2xl font-bold text-white mb-2">{t('community_title')}</h3>
+              <p className="text-slate-400">{t('community_desc')}</p>
             </div>
             <div className="flex justify-center gap-6">
               <motion.a
@@ -341,8 +340,8 @@ export default function Home() {
         {/* Footer */}
         <footer className="px-4 py-8 border-t border-slate-800">
           <div className="max-w-6xl mx-auto text-center text-slate-600 text-sm">
-            <p>© 2026 Stake Prediction. Все права защищены.</p>
-            <p className="mt-2">⚠️ Для развлекательных целей. Играйте ответственно.</p>
+            <p>{t('copyright')}</p>
+            <p className="mt-2">{t('warning')}</p>
           </div>
         </footer>
       </div>
