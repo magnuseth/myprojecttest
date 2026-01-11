@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HelpCircle, Sparkles, Shield, Zap, CheckCircle, PlayCircle } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { getTranslation } from '@/components/translations';
 
 export default function FAQ() {
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  useEffect(() => {
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
+  }, []);
+
+  const t = (key) => getTranslation(language, key);
   const faqs = [
     {
       question: 'Что такое Stake Prediction?',
@@ -48,7 +60,7 @@ export default function FAQ() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 -mt-20 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 pb-12">
       {/* Фоновые эффекты */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
@@ -66,10 +78,10 @@ export default function FAQ() {
             <HelpCircle className="w-12 h-12 text-emerald-400" />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-            Часто задаваемые вопросы
+            {t('faq_title')}
           </h1>
           <p className="text-slate-400 text-lg">
-            Всё что вам нужно знать о Stake Prediction
+            {t('faq_subtitle')}
           </p>
         </motion.div>
 
@@ -83,7 +95,7 @@ export default function FAQ() {
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border-2 border-slate-700 shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
               <PlayCircle className="w-6 h-6 text-emerald-400" />
-              <h2 className="text-2xl font-bold text-white">Обучающее видео</h2>
+              <h2 className="text-2xl font-bold text-white">{t('video_tutorial')}</h2>
             </div>
             <div className="aspect-video bg-slate-950 rounded-xl overflow-hidden border-2 border-slate-700">
               <iframe
@@ -98,7 +110,7 @@ export default function FAQ() {
               />
             </div>
             <p className="text-slate-400 text-sm mt-4">
-              Замените ссылку в этом блоке на ваше реальное видео с YouTube
+              {t('watch_video')}
             </p>
           </div>
         </motion.div>
@@ -111,9 +123,9 @@ export default function FAQ() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
         >
           {[
-            { icon: Shield, title: 'Провабли фейр', desc: 'Полная прозрачность результатов' },
-            { icon: Zap, title: '8 игр', desc: 'Mines, Crash, Dice и другие' },
-            { icon: Sparkles, title: 'AI предсказания', desc: 'Умные алгоритмы генерации' }
+            { icon: Shield, title: t('feature_provably_fair'), desc: t('feature_provably_fair_desc') },
+            { icon: Zap, title: t('feature_8_games'), desc: t('feature_8_games_desc') },
+            { icon: Sparkles, title: t('feature_instant'), desc: t('feature_instant_desc') }
           ].map((feature, index) => (
             <div key={index} className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700">
               <feature.icon className="w-10 h-10 text-emerald-400 mb-4" />
@@ -155,9 +167,9 @@ export default function FAQ() {
           className="mt-12 text-center"
         >
           <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl p-8 border border-emerald-500/30">
-            <h3 className="text-2xl font-bold text-white mb-4">Остались вопросы?</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">{t('need_help')}</h3>
             <p className="text-slate-400 mb-6">
-              Присоединяйтесь к нашему Discord серверу для получения помощи
+              {t('join_community')}
             </p>
             <div className="flex justify-center gap-4">
               <a

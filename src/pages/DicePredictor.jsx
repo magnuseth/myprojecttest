@@ -6,13 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dices, ArrowLeft, Sparkles, RotateCcw, Hash } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PredictionCounter from '../components/PredictionCounter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTranslation } from '@/components/translations';
 
 export default function DicePredictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [clientSeed, setClientSeed] = useState('');
   const [serverSeed, setServerSeed] = useState('');
   const [prediction, setPrediction] = useState(null);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -21,12 +28,45 @@ export default function DicePredictor() {
       
       if (!authenticated) {
         base44.auth.redirectToLogin(window.location.href);
+      } else {
+        const userData = await base44.auth.me();
+        setUser(userData);
       }
       
       setIsLoading(false);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const subs = await base44.entities.Subscription.filter({ user_email: user.email });
+      return subs[0] || null;
+    },
+    enabled: !!user?.email
+  });
+
+  const updateSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      if (!subscription) return;
+      await base44.entities.Subscription.update(subscription.id, {
+        predictions_used: subscription.predictions_used + 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    }
+  });
+
+  const t = (key) => getTranslation(language, key);
 
   const hashSeed = (str) => {
     let hash = 0;
@@ -44,10 +84,17 @@ export default function DicePredictor() {
   };
 
   const handlePredict = () => {
-    if (!clientSeed || !serverSeed) {
-      alert('Пожалуйста, введите оба seed');
+    if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
+      alert(t('remaining_none'));
       return;
     }
+    
+    if (!clientSeed || !serverSeed) {
+      alert(t('enter_seeds_predict'));
+      return;
+    }
+
+    updateSubscriptionMutation.mutate();
 
     const combinedSeed = hashSeed(clientSeed + serverSeed);
     const random = seededRandom(combinedSeed);
@@ -73,7 +120,7 @@ export default function DicePredictor() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+        <div className="text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -83,7 +130,7 @@ export default function DicePredictor() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 pb-12">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -92,7 +139,7 @@ export default function DicePredictor() {
       <div className="relative max-w-5xl mx-auto">
         <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Назад к выбору</span>
+          <span>{t('back_to_selection')}</span>
         </Link>
 
         <motion.div
@@ -101,13 +148,23 @@ export default function DicePredictor() {
           className="text-center mb-8"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-            Dice Predictor
+            {t('dice_predictor')}
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <Dices className="w-5 h-5 text-blue-400" />
-            Предсказание результата броска
+            {t('dice_desc')}
           </p>
         </motion.div>
+
+        {subscription && (
+          <div className="mb-8">
+            <PredictionCounter 
+              used={subscription.predictions_used} 
+              limit={subscription.predictions_limit}
+              language={language}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Результат */}
