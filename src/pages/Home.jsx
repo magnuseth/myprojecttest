@@ -5,9 +5,11 @@ import { createPageUrl } from '../utils';
 import { Sparkles, Zap, Shield, TrendingUp, Users, Trophy, ArrowRight, Gem, CheckCircle, LogIn, UserPlus, HelpCircle, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
+import { getTranslation } from '@/components/translations';
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -15,7 +17,15 @@ export default function Home() {
       setIsAuthenticated(authenticated);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const t = (key) => getTranslation(language, key);
 
   const features = [
     {
@@ -40,11 +50,11 @@ export default function Home() {
     }
   ];
 
-  const stats = [
-    { value: '150K+', label: 'Предсказаний' },
-    { value: '99.9%', label: 'Uptime' },
-    { value: '12K+', label: 'Пользователей' },
-    { value: '8', label: 'Игр' }
+  const getStats = () => [
+    { value: '150K+', label: t('predictions') },
+    { value: '99.9%', label: t('uptime') },
+    { value: '12K+', label: t('users') },
+    { value: '8', label: t('games') }
   ];
 
   const games = [
@@ -84,7 +94,7 @@ export default function Home() {
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-full px-6 py-2 mb-8"
               >
                 <Trophy className="w-4 h-4 text-emerald-400" />
-                <span className="text-emerald-400 font-semibold text-sm">Лучший предиктор для Stake 2026</span>
+                <span className="text-emerald-400 font-semibold text-sm">{t('hero_title')} 2026</span>
               </motion.div>
 
               {/* Заголовок */}
@@ -95,10 +105,10 @@ export default function Home() {
                 className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
               >
                 <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                  Stake Prediction
+                  {t('hero_title')}
                 </span>
                 <br />
-                <span className="text-white">Лучший AI предиктор</span>
+                <span className="text-white">{t('hero_subtitle')}</span>
               </motion.h1>
 
               {/* Описание */}
@@ -108,9 +118,9 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed"
               >
-                Профессиональный инструмент для предсказания результатов на Stake.
+                {t('hero_description')}
                 <br />
-                <span className="text-emerald-400">8 игр</span> с провабли фейр системой и поддержкой custom seeds.
+                <span className="text-emerald-400">{t('hero_games')}</span> {t('hero_fair')}
               </motion.p>
 
               {/* CTA кнопки */}
@@ -124,14 +134,14 @@ export default function Home() {
                   <>
                     <Link to={createPageUrl('Predictor')}>
                       <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
-                        Начать предсказание
+                        {t('start_prediction')}
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
                     <Link to={createPageUrl('FAQ')}>
                       <Button variant="outline" className="border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
                         <HelpCircle className="mr-2 w-5 h-5" />
-                        Как это работает?
+                        {t('learn_more')}
                       </Button>
                     </Link>
                   </>
@@ -142,12 +152,12 @@ export default function Home() {
                       className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group"
                     >
                       <LogIn className="mr-2 w-5 h-5" />
-                      Войти / Регистрация
+                      {t('login_register')}
                     </Button>
                     <Link to={createPageUrl('FAQ')}>
                       <Button variant="outline" className="border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
                         <HelpCircle className="mr-2 w-5 h-5" />
-                        Узнать больше
+                        {t('learn_more')}
                       </Button>
                     </Link>
                   </>
@@ -162,7 +172,7 @@ export default function Home() {
               transition={{ delay: 0.7 }}
               className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
             >
-              {stats.map((stat, index) => (
+              {getStats().map((stat, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}

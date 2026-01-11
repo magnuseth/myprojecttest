@@ -6,13 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TrendingUp, ArrowLeft, Sparkles, RotateCcw, Hash } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PredictionCounter from '../components/PredictionCounter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTranslation } from '@/components/translations';
 
 export default function CrashPredictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [clientSeed, setClientSeed] = useState('');
   const [serverSeed, setServerSeed] = useState('');
   const [prediction, setPrediction] = useState(null);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -21,12 +28,45 @@ export default function CrashPredictor() {
       
       if (!authenticated) {
         base44.auth.redirectToLogin(window.location.href);
+      } else {
+        const userData = await base44.auth.me();
+        setUser(userData);
       }
       
       setIsLoading(false);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const subs = await base44.entities.Subscription.filter({ user_email: user.email });
+      return subs[0] || null;
+    },
+    enabled: !!user?.email
+  });
+
+  const updateSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      if (!subscription) return;
+      await base44.entities.Subscription.update(subscription.id, {
+        predictions_used: subscription.predictions_used + 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    }
+  });
+
+  const t = (key) => getTranslation(language, key);
 
   const hashSeed = (str) => {
     let hash = 0;
@@ -44,10 +84,17 @@ export default function CrashPredictor() {
   };
 
   const handlePredict = () => {
-    if (!clientSeed || !serverSeed) {
-      alert('Пожалуйста, введите оба seed');
+    if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
+      alert(t('remaining_none'));
       return;
     }
+    
+    if (!clientSeed || !serverSeed) {
+      alert(t('enter_seeds_predict'));
+      return;
+    }
+
+    updateSubscriptionMutation.mutate();
 
     const combinedSeed = hashSeed(clientSeed + serverSeed);
     const random = seededRandom(combinedSeed);
@@ -91,7 +138,7 @@ export default function CrashPredictor() {
       <div className="relative max-w-5xl mx-auto">
         <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Назад к выбору</span>
+          <span>{t('back_to_selection')}</span>
         </Link>
 
         <motion.div
@@ -100,15 +147,25 @@ export default function CrashPredictor() {
           className="text-center mb-8"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 bg-clip-text text-transparent">
-            Crash Predictor
+            {t('crash_predictor')}
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <TrendingUp className="w-5 h-5 text-orange-400" />
-            Предсказание точки краха
+            {t('crash_point_prediction')}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {subscription && (
+            <div className="lg:col-span-2">
+              <PredictionCounter 
+                used={subscription.predictions_used} 
+                limit={subscription.predictions_limit}
+                language={language}
+              />
+            </div>
+          )}
+          
           {/* Результат */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

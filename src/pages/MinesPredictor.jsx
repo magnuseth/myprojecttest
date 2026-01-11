@@ -8,6 +8,7 @@ import { Sparkles, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PredictionCounter from '../components/PredictionCounter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTranslation } from '@/components/translations';
 
 export default function MinesPredictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -106,9 +107,11 @@ export default function MinesPredictor() {
     return x - Math.floor(x);
   };
 
+  const t = (key) => getTranslation(language, key);
+
   const handlePredict = () => {
     if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
-      alert('Попытки закончились! Обновите подписку в настройках.');
+      alert(t('remaining_none'));
       return;
     }
 
@@ -161,7 +164,7 @@ export default function MinesPredictor() {
       <div className="relative max-w-7xl mx-auto">
         <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Назад к выбору</span>
+          <span>{t('back_to_selection')}</span>
         </Link>
 
         <motion.div
@@ -170,11 +173,11 @@ export default function MinesPredictor() {
           className="text-center mb-8"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-            Mines Predictor
+            {t('mines_predictor')}
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <Sparkles className="w-5 h-5 text-emerald-400" />
-            Генератор безопасных ячеек
+            {t('safe_cells_generator')}
           </p>
         </motion.div>
 
@@ -192,8 +195,8 @@ export default function MinesPredictor() {
                   className="mb-6 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-xl p-4 border border-emerald-500/30"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-emerald-400 font-semibold">Предсказание готово</span>
-                    <span className="text-white font-bold">{safeCells.length} безопасных ячеек</span>
+                    <span className="text-emerald-400 font-semibold">{t('prediction_ready')}</span>
+                    <span className="text-white font-bold">{safeCells.length} {t('safe_cells')}</span>
                   </div>
                 </motion.div>
               )}
@@ -215,7 +218,7 @@ export default function MinesPredictor() {
                   animate={{ opacity: 1 }}
                   className="text-center text-slate-500 mt-6 text-sm"
                 >
-                  Настройте параметры и нажмите "Предсказать" →
+                  {t('configure_predict')}
                 </motion.p>
               )}
             </motion.div>
