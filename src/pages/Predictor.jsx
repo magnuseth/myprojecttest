@@ -5,10 +5,12 @@ import { createPageUrl } from '../utils';
 import { Gem, Zap, Target, Dices, TrendingUp, ChevronRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
+import { getTranslation } from '@/components/translations';
 
 export default function Predictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,13 +25,21 @@ export default function Predictor() {
       setIsLoading(false);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
 
-  const predictors = [
+  const t = (key) => getTranslation(language, key);
+
+  const getPredictors = () => [
     {
       id: 'mines',
       name: 'Mines',
-      description: 'Предсказание безопасных ячеек на поле с минами',
+      description: t('mines_desc'),
       icon: Gem,
       color: 'from-emerald-500 to-teal-500',
       bgGlow: 'bg-emerald-500/10',
@@ -38,7 +48,7 @@ export default function Predictor() {
     {
       id: 'crash',
       name: 'Crash',
-      description: 'Предсказание точки краха и оптимальный момент выхода',
+      description: t('crash_desc'),
       icon: TrendingUp,
       color: 'from-orange-500 to-red-500',
       bgGlow: 'bg-orange-500/10',
@@ -47,7 +57,7 @@ export default function Predictor() {
     {
       id: 'chicken',
       name: 'Chicken',
-      description: 'Предсказание безопасных клеток с выбором сложности',
+      description: t('chicken_desc'),
       icon: Target,
       color: 'from-yellow-500 to-orange-500',
       bgGlow: 'bg-yellow-500/10',
@@ -56,7 +66,7 @@ export default function Predictor() {
     {
       id: 'dice',
       name: 'Dice',
-      description: 'Предсказание результата броска кубика',
+      description: t('dice_desc'),
       icon: Dices,
       color: 'from-blue-500 to-cyan-500',
       bgGlow: 'bg-blue-500/10',
@@ -65,7 +75,7 @@ export default function Predictor() {
     {
       id: 'limbo',
       name: 'Limbo',
-      description: 'Предсказание множителя для игры Limbo',
+      description: t('limbo_desc'),
       icon: Zap,
       color: 'from-purple-500 to-pink-500',
       bgGlow: 'bg-purple-500/10',
@@ -74,7 +84,7 @@ export default function Predictor() {
     {
       id: 'wheel',
       name: 'Wheel',
-      description: 'Предсказание выигрышного сектора колеса фортуны',
+      description: t('wheel_desc'),
       icon: Target,
       color: 'from-indigo-500 to-purple-500',
       bgGlow: 'bg-indigo-500/10',
@@ -83,7 +93,7 @@ export default function Predictor() {
     {
       id: 'flip',
       name: 'Flip',
-      description: 'Предсказание результата подбрасывания монеты',
+      description: t('flip_desc'),
       icon: Gem,
       color: 'from-slate-500 to-gray-500',
       bgGlow: 'bg-slate-500/10',
@@ -92,7 +102,7 @@ export default function Predictor() {
     {
       id: 'keno',
       name: 'Keno',
-      description: 'Предсказание выигрышных чисел в игре Keno',
+      description: t('keno_desc'),
       icon: Sparkles,
       color: 'from-pink-500 to-rose-500',
       bgGlow: 'bg-pink-500/10',
@@ -103,7 +113,7 @@ export default function Predictor() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+        <div className="text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -113,7 +123,7 @@ export default function Predictor() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 -mt-20 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 pb-12">
       {/* Фоновые эффекты */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
@@ -129,17 +139,17 @@ export default function Predictor() {
           className="text-center mb-12"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-            Выберите предиктор
+            {t('select_predictor')}
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <Sparkles className="w-5 h-5 text-emerald-400" />
-            Профессиональные инструменты для предсказаний
+            {t('professional_tools')}
           </p>
         </motion.div>
 
         {/* Сетка предикторов */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {predictors.map((predictor, index) => {
+          {getPredictors().map((predictor, index) => {
             const Icon = predictor.icon;
             return (
               <motion.div
@@ -173,7 +183,7 @@ export default function Predictor() {
                       {/* Кнопка */}
                       <div className="flex items-center justify-between">
                         <span className={`text-sm font-semibold bg-gradient-to-r ${predictor.color} bg-clip-text text-transparent`}>
-                          Запустить
+                          {t('run_predictor')}
                         </span>
                         <ChevronRight className={`w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform`} />
                       </div>
