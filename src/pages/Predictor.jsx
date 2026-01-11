@@ -70,6 +70,33 @@ export default function Predictor() {
       color: 'from-purple-500 to-pink-500',
       bgGlow: 'bg-purple-500/10',
       page: 'LimboPredictor'
+    },
+    {
+      id: 'wheel',
+      name: 'Wheel',
+      description: 'Предсказание выигрышного сектора колеса фортуны',
+      icon: Target,
+      color: 'from-indigo-500 to-purple-500',
+      bgGlow: 'bg-indigo-500/10',
+      page: 'WheelPredictor'
+    },
+    {
+      id: 'flip',
+      name: 'Flip',
+      description: 'Предсказание результата подбрасывания монеты',
+      icon: Gem,
+      color: 'from-slate-500 to-gray-500',
+      bgGlow: 'bg-slate-500/10',
+      page: 'FlipPredictor'
+    },
+    {
+      id: 'keno',
+      name: 'Keno',
+      description: 'Предсказание выигрышных чисел в игре Keno',
+      icon: Sparkles,
+      color: 'from-pink-500 to-rose-500',
+      bgGlow: 'bg-pink-500/10',
+      page: 'KenoPredictor'
     }
   ];
 
