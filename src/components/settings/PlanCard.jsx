@@ -2,8 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Zap, Crown, Infinity } from 'lucide-react';
+import { getTranslation } from '@/components/translations';
 
-export default function PlanCard({ plan, isCurrentPlan, onSelect }) {
+export default function PlanCard({ plan, language = 'en', isCurrentPlan, onSelect }) {
+  const t = (key) => getTranslation(language, key);
   const planIcons = {
     free: Zap,
     basic: CheckCircle,
@@ -25,8 +27,8 @@ export default function PlanCard({ plan, isCurrentPlan, onSelect }) {
     >
       {/* Популярный бейдж */}
       {plan.popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1 rounded-full text-xs font-bold text-white">
-          ПОПУЛЯРНЫЙ
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1 rounded-full text-xs font-bold text-white uppercase">
+          {language === 'ru' ? 'популярный' : language === 'es' ? 'popular' : language === 'pt' ? 'popular' : language === 'tr' ? 'popüler' : language === 'hi' ? 'लोकप्रिय' : 'popular'}
         </div>
       )}
 
@@ -41,7 +43,7 @@ export default function PlanCard({ plan, isCurrentPlan, onSelect }) {
       {/* Цена */}
       <div className="mb-4">
         <span className="text-4xl font-bold text-white">${plan.price}</span>
-        {plan.price > 0 && <span className="text-slate-400 ml-2">/месяц</span>}
+        {plan.price > 0 && <span className="text-slate-400 ml-2">/{language === 'ru' ? 'месяц' : language === 'es' ? 'mes' : language === 'pt' ? 'mês' : language === 'tr' ? 'ay' : language === 'hi' ? 'महीना' : 'month'}</span>}
       </div>
 
       {/* Описание */}
@@ -69,7 +71,7 @@ export default function PlanCard({ plan, isCurrentPlan, onSelect }) {
           }
         `}
       >
-        {isCurrentPlan ? 'Текущий план' : 'Выбрать план'}
+        {isCurrentPlan ? t('current') : t('select_plan')}
       </Button>
     </motion.div>
   );

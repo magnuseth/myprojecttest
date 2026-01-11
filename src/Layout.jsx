@@ -50,7 +50,7 @@ export default function Layout({ children, currentPageName }) {
             </Link>
 
             {/* Навигационные ссылки */}
-            <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-6">
               <Link 
                 to={createPageUrl('Home')} 
                 className={`text-sm font-medium transition-colors ${
@@ -118,6 +118,22 @@ export default function Layout({ children, currentPageName }) {
               )}
               
               <LanguageSelector currentLang={language} onLanguageChange={handleLanguageChange} />
+            </div>
+
+            {/* Mobile menu button - показывается только на маленьких экранах */}
+            <div className="md:hidden flex items-center gap-3">
+              <LanguageSelector currentLang={language} onLanguageChange={handleLanguageChange} />
+              {isAuthenticated ? (
+                <Link to={createPageUrl('Settings')}>
+                  <Button size="sm" variant="ghost" className="text-slate-400 hover:text-white">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button onClick={handleLogin} size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                  <LogIn className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>

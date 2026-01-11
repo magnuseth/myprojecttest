@@ -6,13 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Zap, ArrowLeft, Sparkles, RotateCcw, Hash, TrendingUp } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PredictionCounter from '../components/PredictionCounter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTranslation } from '@/components/translations';
 
 export default function LimboPredictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [clientSeed, setClientSeed] = useState('');
   const [serverSeed, setServerSeed] = useState('');
   const [prediction, setPrediction] = useState(null);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -21,12 +28,45 @@ export default function LimboPredictor() {
       
       if (!authenticated) {
         base44.auth.redirectToLogin(window.location.href);
+      } else {
+        const userData = await base44.auth.me();
+        setUser(userData);
       }
       
       setIsLoading(false);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const subs = await base44.entities.Subscription.filter({ user_email: user.email });
+      return subs[0] || null;
+    },
+    enabled: !!user?.email
+  });
+
+  const updateSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      if (!subscription) return;
+      await base44.entities.Subscription.update(subscription.id, {
+        predictions_used: subscription.predictions_used + 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    }
+  });
+
+  const t = (key) => getTranslation(language, key);
 
   const hashSeed = (str) => {
     let hash = 0;
@@ -44,10 +84,17 @@ export default function LimboPredictor() {
   };
 
   const handlePredict = () => {
-    if (!clientSeed || !serverSeed) {
-      alert('Пожалуйста, введите оба seed');
+    if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
+      alert(t('remaining_none'));
       return;
     }
+    
+    if (!clientSeed || !serverSeed) {
+      alert(t('enter_seeds_predict'));
+      return;
+    }
+
+    updateSubscriptionMutation.mutate();
 
     const combinedSeed = hashSeed(clientSeed + serverSeed);
     const random = seededRandom(combinedSeed);
@@ -85,7 +132,7 @@ export default function LimboPredictor() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+        <div className="text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -95,7 +142,7 @@ export default function LimboPredictor() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 pb-12">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl" />
@@ -104,7 +151,7 @@ export default function LimboPredictor() {
       <div className="relative max-w-5xl mx-auto">
         <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Назад к выбору</span>
+          <span>{t('back_to_selection')}</span>
         </Link>
 
         <motion.div
@@ -113,13 +160,23 @@ export default function LimboPredictor() {
           className="text-center mb-8"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-fuchsia-400 bg-clip-text text-transparent">
-            Limbo Predictor
+            {t('limbo_predictor')}
           </h1>
           <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
             <Zap className="w-5 h-5 text-purple-400" />
-            Предсказание множителя
+            {t('limbo_desc')}
           </p>
         </motion.div>
+
+        {subscription && (
+          <div className="mb-8">
+            <PredictionCounter 
+              used={subscription.predictions_used} 
+              limit={subscription.predictions_limit}
+              language={language}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Результат */}
@@ -131,25 +188,25 @@ export default function LimboPredictor() {
             {prediction ? (
               <div className="space-y-6">
                 <div className="text-center">
-                  <div className="text-slate-400 text-sm mb-2">Предсказанный множитель</div>
+                  <div className="text-slate-400 text-sm mb-2">{t('target_multiplier')}</div>
                   <div className="text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
                     {prediction.multiplier}x
                   </div>
                   
                   {prediction.riskLevel && (
                     <div className={`inline-block px-6 py-3 rounded-xl font-bold text-sm bg-gradient-to-r ${getRiskColor(prediction.riskLevel).bg} ${getRiskColor(prediction.riskLevel).text} border ${getRiskColor(prediction.riskLevel).border}`}>
-                      {prediction.riskLevel === 'high' ? 'Высокий риск' : prediction.riskLevel === 'medium' ? 'Средний риск' : 'Низкий риск'}
+                      {prediction.riskLevel === 'high' ? t('high_risk') : prediction.riskLevel === 'medium' ? t('medium_risk') : t('low_risk')}
                     </div>
                   )}
                 </div>
 
                 <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/30">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-slate-300">Рекомендуемая цель</span>
+                    <span className="text-slate-300">{t('recommended_exit')}</span>
                     <span className="text-3xl font-bold text-green-400">{prediction.targetMultiplier}x</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Уверенность</span>
+                    <span className="text-slate-300">{t('confidence')}</span>
                     <span className="text-xl font-bold text-purple-400">{prediction.confidence}%</span>
                   </div>
                 </div>
@@ -157,12 +214,12 @@ export default function LimboPredictor() {
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                   <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-yellow-400" />
-                    Стратегия
+                    {t('recommendations')}
                   </h3>
                   <ul className="space-y-1 text-slate-400 text-sm">
-                    <li>• Целевой множитель: {prediction.targetMultiplier}x</li>
-                    <li>• Максимум: {prediction.multiplier}x</li>
-                    <li>• {prediction.riskLevel === 'high' ? 'Играйте осторожно' : 'Умеренный риск'}</li>
+                    <li>• {t('target')}: {prediction.targetMultiplier}x</li>
+                    <li>• {t('multiplier')}: {prediction.multiplier}x</li>
+                    <li>• {t('risk_level')}: {prediction.riskLevel === 'high' ? t('high_risk') : prediction.riskLevel === 'medium' ? t('medium_risk') : t('low_risk')}</li>
                   </ul>
                 </div>
               </div>
@@ -170,7 +227,7 @@ export default function LimboPredictor() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center text-slate-500">
                   <Zap className="w-20 h-20 mx-auto mb-4 opacity-30" />
-                  <p>Введите seeds и нажмите "Предсказать"</p>
+                  <p>{t('enter_seeds_predict')}</p>
                 </div>
               </div>
             )}
@@ -182,18 +239,18 @@ export default function LimboPredictor() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border-2 border-slate-700 shadow-2xl"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Параметры</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('parameters')}</h2>
 
             <div className="space-y-6">
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-purple-400" />
-                  Client Seed
+                  {t('client_seed')}
                 </label>
                 <Input
                   value={clientSeed}
                   onChange={(e) => setClientSeed(e.target.value)}
-                  placeholder="Введите client seed"
+                  placeholder={t('enter_client_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20"
                 />
               </div>
@@ -201,23 +258,14 @@ export default function LimboPredictor() {
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-pink-400" />
-                  Server Seed
+                  {t('server_seed')}
                 </label>
                 <Input
                   value={serverSeed}
                   onChange={(e) => setServerSeed(e.target.value)}
-                  placeholder="Введите server seed"
+                  placeholder={t('enter_server_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-pink-500 focus:ring-pink-500/20"
                 />
-              </div>
-
-              <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
-                <h3 className="text-white font-semibold mb-2 text-sm">О Limbo</h3>
-                <ul className="space-y-1 text-slate-400 text-xs">
-                  <li>• Множитель от 1.00x до 1000x+</li>
-                  <li>• Чем выше цель, тем выше риск</li>
-                  <li>• Рекомендуем консервативные ставки</li>
-                </ul>
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -227,7 +275,7 @@ export default function LimboPredictor() {
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 rounded-xl disabled:opacity-50"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Предсказать
+                  {t('predict')}
                 </Button>
 
                 {prediction && (
@@ -236,7 +284,7 @@ export default function LimboPredictor() {
                     className="flex-1 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-semibold py-6 rounded-xl"
                   >
                     <RotateCcw className="w-5 h-5 mr-2" />
-                    Сбросить
+                    {t('reset')}
                   </Button>
                 )}
               </div>

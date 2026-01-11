@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import ProfileSection from '../components/settings/ProfileSection';
 import PlanCard from '../components/settings/PlanCard';
 import { toast } from 'sonner';
+import { getTranslation } from '@/components/translations';
 
 export default function Settings() {
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
 
   // Загрузка пользователя
   useEffect(() => {
@@ -23,7 +25,15 @@ export default function Settings() {
       }
     };
     loadUser();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const t = (key) => getTranslation(language, key);
 
   // Загрузка подписки
   const { data: subscriptions = [] } = useQuery({
@@ -35,60 +45,60 @@ export default function Settings() {
   const currentSubscription = subscriptions[0];
 
   // Планы
-  const plans = [
+  const getPlans = () => [
     {
       id: 'free',
-      name: 'Free',
+      name: t('plan_free'),
       price: 0,
-      description: 'Идеально для начала',
+      description: t('perfect_start'),
       color: 'from-slate-600 to-slate-700',
       features: [
-        '10 предсказаний в день',
-        'Базовые настройки',
-        'Стандартная поддержка'
+        `10 ${t('predictions_per_day')}`,
+        t('basic_settings'),
+        t('standard_support')
       ]
     },
     {
       id: 'basic',
-      name: 'Basic',
+      name: t('plan_basic'),
       price: 9,
-      description: 'Для регулярного использования',
+      description: t('regular_use'),
       color: 'from-blue-500 to-blue-600',
       popular: false,
       features: [
-        '100 предсказаний в день',
-        'Все настройки',
-        'Приоритетная поддержка',
-        'Статистика использования'
+        `100 ${t('predictions_per_day')}`,
+        t('all_settings'),
+        t('priority_support'),
+        t('usage_statistics')
       ]
     },
     {
       id: 'pro',
-      name: 'Pro',
+      name: t('plan_pro'),
       price: 29,
-      description: 'Для профессионалов',
+      description: t('for_professionals'),
       color: 'from-purple-500 to-purple-600',
       popular: true,
       features: [
-        '500 предсказаний в день',
-        'Все функции Basic',
-        'Расширенная аналитика',
-        'API доступ',
-        'VIP поддержка 24/7'
+        `500 ${t('predictions_per_day')}`,
+        t('all_basic_features'),
+        t('extended_analytics'),
+        t('api_access'),
+        t('vip_support')
       ]
     },
     {
       id: 'unlimited',
-      name: 'Unlimited',
+      name: t('plan_unlimited'),
       price: 99,
-      description: 'Без ограничений',
+      description: t('no_limits'),
       color: 'from-emerald-500 to-teal-500',
       features: [
-        '∞ Неограниченные предсказания',
-        'Все функции Pro',
-        'Белый список IP',
-        'Персональный менеджер',
-        'Кастомные интеграции'
+        t('unlimited_predictions'),
+        t('all_pro_features'),
+        t('ip_whitelist'),
+        t('personal_manager'),
+        t('custom_integrations')
       ]
     }
   ];
@@ -122,7 +132,7 @@ export default function Settings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscription'] });
-      toast.success('План успешно обновлён!');
+      toast.success(t('success'));
     },
   });
 
@@ -133,7 +143,7 @@ export default function Settings() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white">Загрузка...</div>
+        <div className="text-white">{t('loading')}</div>
       </div>
     );
   }
@@ -155,9 +165,9 @@ export default function Settings() {
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 flex items-center gap-3">
             <SettingsIcon className="w-10 h-10 text-emerald-400" />
-            Настройки
+            {t('profile_settings')}
           </h1>
-          <p className="text-slate-400 text-lg">Управление профилем и подпиской</p>
+          <p className="text-slate-400 text-lg">{t('manage_profile')}</p>
         </motion.div>
 
         {/* Статус подписки */}
@@ -169,10 +179,10 @@ export default function Settings() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h3 className="text-white font-bold text-xl mb-1">
-                Текущий план: <span className="text-emerald-400">{currentSubscription?.plan?.toUpperCase() || 'FREE'}</span>
+                {t('current_plan')}: <span className="text-emerald-400">{currentSubscription?.plan?.toUpperCase() || 'FREE'}</span>
               </h3>
               <p className="text-slate-300">
-                Использовано: {currentSubscription?.predictions_used || 0} / {currentSubscription?.predictions_limit || 10} предсказаний
+                {t('used')}: {currentSubscription?.predictions_used || 0} / {currentSubscription?.predictions_limit || 10}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -180,7 +190,7 @@ export default function Settings() {
               <span className="text-white font-semibold">
                 {currentSubscription?.predictions_limit && currentSubscription.predictions_used 
                   ? Math.round((currentSubscription.predictions_used / currentSubscription.predictions_limit) * 100)
-                  : 0}% использовано
+                  : 0}% {t('used_percentage')}
               </span>
             </div>
           </div>
@@ -191,6 +201,7 @@ export default function Settings() {
           <div className="lg:col-span-1">
             <ProfileSection 
               user={user} 
+              language={language}
               onUpdate={async () => {
                 const userData = await base44.auth.me();
                 setUser(userData);
@@ -210,7 +221,7 @@ export default function Settings() {
                 className="w-full border-2 border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 font-semibold py-6 rounded-xl"
               >
                 <LogOut className="w-5 h-5 mr-2" />
-                Выйти из аккаунта
+                {t('logout_account')}
               </Button>
             </motion.div>
           </div>
@@ -224,14 +235,15 @@ export default function Settings() {
             >
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <CreditCard className="w-6 h-6 text-emerald-400" />
-                Планы и подписка
+                {t('plans_subscription')}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {plans.map((plan) => (
+                {getPlans().map((plan) => (
                   <PlanCard
                     key={plan.id}
                     plan={plan}
+                    language={language}
                     isCurrentPlan={currentSubscription?.plan === plan.id || (!currentSubscription && plan.id === 'free')}
                     onSelect={(planId) => updatePlanMutation.mutate(planId)}
                   />
@@ -248,7 +260,7 @@ export default function Settings() {
           transition={{ delay: 0.4 }}
           className="text-center text-slate-600 text-sm"
         >
-          <p>💡 Лимиты обновляются ежедневно в 00:00 UTC</p>
+          <p>💡 {t('daily_reset')}</p>
         </motion.div>
       </div>
     </div>
