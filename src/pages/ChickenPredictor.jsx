@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Target, ArrowLeft, Sparkles, RotateCcw, Hash, Shield } from 'lucide-react';
+import { ArrowLeft, Zap, Hash, Shield, Loader2, CheckCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PredictionCounter from '../components/PredictionCounter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,25 +18,9 @@ export default function ChickenPredictor() {
   const [clientSeed, setClientSeed] = useState('');
   const [serverSeed, setServerSeed] = useState('');
   const [difficulty, setDifficulty] = useState('medium');
-  const [safeCells, setSafeCells] = useState([]);
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [result, setResult] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
-
-  const queryClient = useQueryClient();
-
-  const gridSizes = {
-    easy: 16,
-    medium: 20,
-    hard: 25,
-    expert: 30
-  };
-
-  const bonesCounts = {
-    easy: 3,
-    medium: 5,
-    hard: 8,
-    expert: 12
-  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -71,6 +55,8 @@ export default function ChickenPredictor() {
     enabled: !!user?.email
   });
 
+  const queryClient = useQueryClient();
+
   const updateSubscriptionMutation = useMutation({
     mutationFn: async () => {
       if (!subscription) return;
@@ -85,63 +71,45 @@ export default function ChickenPredictor() {
 
   const t = (key) => getTranslation(language, key);
 
-  const hashSeed = (str) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash);
-  };
-
-  const seededRandom = (seed) => {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  };
-
-  const handlePredict = () => {
+  const handleGetValue = async () => {
     if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
       alert(t('remaining_none'));
       return;
     }
-    
-    if (!clientSeed || !serverSeed) {
-      alert(t('enter_seeds_predict'));
-      return;
+
+    setIsCalculating(true);
+    setResult(null);
+
+    try {
+      const response = await fetch('https://aquila.cash/api/v1/prediction/chicken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clientSeed: clientSeed || null,
+          serverSeed: serverSeed || null,
+          difficulty: difficulty
+        })
+      });
+
+      const data = await response.json();
+      
+      setTimeout(() => {
+        setResult(data.result);
+        setIsCalculating(false);
+        updateSubscriptionMutation.mutate();
+      }, 800);
+      
+    } catch (error) {
+      console.error('Error fetching prediction:', error);
+      setIsCalculating(false);
+      alert('Error getting value. Please try again.');
     }
-
-    updateSubscriptionMutation.mutate();
-
-    const totalCells = gridSizes[difficulty];
-    const bonesCount = bonesCounts[difficulty];
-    const safeCount = totalCells - bonesCount;
-    
-    const combinedSeed = hashSeed(clientSeed + serverSeed + difficulty);
-    const allCells = Array.from({ length: totalCells }, (_, i) => i);
-    
-    const shuffled = allCells.sort((a, b) => {
-      return seededRandom(combinedSeed + a) - seededRandom(combinedSeed + b);
-    });
-    
-    const safe = shuffled.slice(0, safeCount);
-    setSafeCells(safe);
-    setIsRevealed(true);
   };
 
   const handleReset = () => {
-    setSafeCells([]);
-    setIsRevealed(false);
-  };
-
-  const getGridCols = () => {
-    const cols = {
-      easy: 4,
-      medium: 5,
-      hard: 5,
-      expert: 6
-    };
-    return cols[difficulty];
+    setResult(null);
   };
 
   if (isLoading) {
@@ -158,12 +126,13 @@ export default function ChickenPredictor() {
 
   return (
     <div className="p-4 md:p-8 pb-12">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>{t('back_to_selection')}</span>
         </Link>
 
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -172,17 +141,20 @@ export default function ChickenPredictor() {
           <motion.div
             animate={{ rotate: [0, -5, 5, -5, 0] }}
             transition={{ repeat: Infinity, duration: 2, repeatDelay: 3 }}
-            className="text-7xl mb-4"
+            className="text-6xl mb-4"
           >
             🐔
           </motion.div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
-            {t('chicken_predictor')}
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+            Chicken Predictor
           </h1>
-          <p className="text-slate-400 text-lg flex items-center justify-center gap-2">
-            <Target className="w-5 h-5 text-yellow-400" />
-            {t('chicken_desc')}
+          <p className="text-slate-400 text-lg mb-4">
+            Значение X для следующей ставки
           </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <span className="text-emerald-400 text-sm font-semibold">READY</span>
+          </div>
         </motion.div>
 
         {subscription && (
@@ -196,163 +168,186 @@ export default function ChickenPredictor() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Результат */}
+          {/* Main Display - X Value */}
           <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 border-2 border-slate-700 shadow-2xl h-full"
+              className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 border-2 border-yellow-500/20 shadow-2xl min-h-[500px] flex items-center justify-center relative overflow-hidden"
             >
-              {isRevealed ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center">
+              {/* Background decoration */}
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 opacity-50" />
+              <div className="absolute top-10 right-10 text-8xl opacity-5">🐔</div>
+              <div className="absolute bottom-10 left-10 text-8xl opacity-5">🐔</div>
+
+              <div className="relative z-10 text-center w-full">
+                <AnimatePresence mode="wait">
+                  {isCalculating ? (
                     <motion.div
-                      animate={{ rotate: [0, -10, 10, -10, 0] }}
-                      transition={{ duration: 0.5 }}
-                      className="text-7xl mb-4"
+                      key="loading"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="space-y-6"
                     >
-                      🐔
+                      <Loader2 className="w-16 h-16 text-yellow-400 animate-spin mx-auto" />
+                      <p className="text-slate-400 text-lg">Getting value...</p>
                     </motion.div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{t('prediction_ready')}</h3>
-                    <p className="text-slate-400">{t('difficulty')}: {t(difficulty)}</p>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-amber-500/20 rounded-2xl p-6 border-2 border-yellow-500/30">
-                    <div className="text-center mb-4">
-                      <p className="text-yellow-400 font-semibold mb-2">{t('safe_cells')}</p>
-                      <p className="text-white font-bold text-5xl">{safeCells.length}</p>
-                    </div>
-                    <div className="bg-slate-800/50 rounded-xl p-4 max-h-48 overflow-y-auto">
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {safeCells.sort((a, b) => a - b).map((cell) => (
-                          <motion.div
-                            key={cell}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring" }}
-                            className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-bold rounded-lg px-4 py-2 shadow-lg"
-                          >
-                            {cell + 1}
-                          </motion.div>
-                        ))}
+                  ) : result ? (
+                    <motion.div
+                      key="result"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      transition={{ type: "spring", duration: 0.6 }}
+                      className="space-y-6"
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, -10, 10, -10, 0] }}
+                        transition={{ duration: 0.5 }}
+                        className="text-7xl mb-4"
+                      >
+                        🐔
+                      </motion.div>
+                      
+                      <div className="space-y-3">
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.2, type: "spring" }}
+                          className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-amber-500/20 rounded-2xl p-8 border-2 border-yellow-500/40"
+                        >
+                          <p className="text-8xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+                            x{result.toFixed(2)}
+                          </p>
+                        </motion.div>
+                        
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                          className="text-slate-400 text-lg"
+                        >
+                          X для ставки
+                        </motion.p>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-800/30 rounded-xl p-4">
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                      <div className="text-xl">ℹ️</div>
-                      <p>Total cells: {gridSizes[difficulty]} • Bones: {bonesCounts[difficulty]}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <div className="text-7xl mb-4 opacity-50">🐔</div>
-                    <p className="text-slate-500 text-lg">{t('configure_predict')}</p>
-                  </div>
-                </div>
-              )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-4"
+                    >
+                      <div className="text-8xl mb-6 opacity-30">🐔</div>
+                      <p className="text-slate-500 text-xl">Настройте параметры</p>
+                      <p className="text-slate-600 text-sm">и нажмите кнопку для получения X</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           </div>
 
-          {/* Панель управления */}
+          {/* Input Panel */}
           <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 border-2 border-yellow-500/20 shadow-2xl"
+              className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 border-2 border-slate-700 shadow-2xl"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center justify-center text-2xl">
-                  🎯
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white">{t('parameters')}</h2>
+                <h2 className="text-2xl font-bold text-white">Параметры</h2>
               </div>
 
               <div className="space-y-6">
+                {/* Difficulty */}
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                     <Shield className="w-4 h-4 text-yellow-400" />
-                    {t('difficulty')}
+                    Difficulty
                   </label>
-                  <Select value={difficulty} onValueChange={setDifficulty}>
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                  <Select value={difficulty} onValueChange={setDifficulty} disabled={isCalculating || result}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white h-12 text-base">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="easy">{t('easy')} (4x4, 3 bones)</SelectItem>
-                      <SelectItem value="medium">{t('medium')} (5x4, 5 bones)</SelectItem>
-                      <SelectItem value="hard">{t('hard')} (5x5, 8 bones)</SelectItem>
-                      <SelectItem value="expert">{t('expert')} (6x5, 12 bones)</SelectItem>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                      <SelectItem value="expert">Expert</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
+                {/* Client Seed */}
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-                    <Hash className="w-4 h-4 text-yellow-400" />
-                    {t('client_seed')}
+                  <label className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                    <Hash className="w-4 h-4 text-emerald-400" />
+                    Client Seed <span className="text-slate-500 text-xs">(optional)</span>
                   </label>
                   <Input
                     value={clientSeed}
                     onChange={(e) => setClientSeed(e.target.value)}
-                    placeholder={t('enter_client_seed')}
-                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-yellow-500 focus:ring-yellow-500/20"
+                    placeholder="Enter client seed..."
+                    disabled={isCalculating || result}
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 h-12 text-base focus:border-emerald-500 focus:ring-emerald-500/20"
                   />
                 </div>
 
+                {/* Server Seed */}
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-                    <Hash className="w-4 h-4 text-orange-400" />
-                    {t('server_seed')}
+                  <label className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                    <Hash className="w-4 h-4 text-blue-400" />
+                    Server Seed <span className="text-slate-500 text-xs">(optional)</span>
                   </label>
                   <Input
                     value={serverSeed}
                     onChange={(e) => setServerSeed(e.target.value)}
-                    placeholder={t('enter_server_seed')}
-                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-orange-500 focus:ring-orange-500/20"
+                    placeholder="Enter server seed..."
+                    disabled={isCalculating || result}
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 h-12 text-base focus:border-blue-500 focus:ring-blue-500/20"
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
-                  {!isRevealed ? (
+                {/* Action Button */}
+                <div className="pt-4">
+                  {!result ? (
                     <Button
-                      onClick={handlePredict}
-                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-7 rounded-xl shadow-lg shadow-yellow-500/30"
+                      onClick={handleGetValue}
+                      disabled={isCalculating}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-7 text-lg rounded-xl shadow-lg shadow-yellow-500/30 disabled:opacity-50"
                     >
-                      <Sparkles className="w-5 h-5 mr-2" />
-                      {t('predict')}
+                      <Zap className="w-5 h-5 mr-2" />
+                      {isCalculating ? 'Getting value...' : 'Get X Value'}
                     </Button>
                   ) : (
                     <Button
                       onClick={handleReset}
-                      className="w-full bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-bold py-7 rounded-xl"
+                      className="w-full bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-bold py-7 text-lg rounded-xl"
                     >
-                      <RotateCcw className="w-5 h-5 mr-2" />
-                      {t('reset')}
+                      <ArrowLeft className="w-5 h-5 mr-2" />
+                      New Request
                     </Button>
                   )}
                 </div>
 
-                {/* Info */}
-                {!isRevealed && (
+                {/* Info box */}
+                {!result && !isCalculating && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4"
+                    className="bg-slate-800/30 border border-slate-700 rounded-xl p-4"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="text-2xl">💡</div>
-                      <div>
-                        <p className="text-yellow-400 font-semibold text-sm mb-1">Pro Tip</p>
-                        <p className="text-slate-400 text-xs">Safe cells will show 🐔 chickens. Bones 🦴 mean danger!</p>
-                      </div>
+                      <div className="text-xl">ℹ️</div>
+                      <p className="text-slate-400 text-sm leading-relaxed">
+                        Выберите сложность и нажмите кнопку для получения значения X. Seeds опциональны.
+                      </p>
                     </div>
                   </motion.div>
                 )}
