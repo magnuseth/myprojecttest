@@ -1,3 +1,4 @@
+import Blowjow from './pages/Blowjow';
 import ChickenPredictor from './pages/ChickenPredictor';
 import CrashPredictor from './pages/CrashPredictor';
 import DicePredictor from './pages/DicePredictor';
@@ -12,11 +13,11 @@ import Predictor from './pages/Predictor';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import WheelPredictor from './pages/WheelPredictor';
-import Blowjow from './pages/Blowjow';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "Blowjow": Blowjow,
     "ChickenPredictor": ChickenPredictor,
     "CrashPredictor": CrashPredictor,
     "DicePredictor": DicePredictor,
@@ -31,7 +32,6 @@ export const PAGES = {
     "Register": Register,
     "Settings": Settings,
     "WheelPredictor": WheelPredictor,
-    "Blowjow": Blowjow,
 }
 
 export const pagesConfig = {
