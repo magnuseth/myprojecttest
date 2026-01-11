@@ -249,6 +249,7 @@ export const translations = {
     total_cells: 'Total Cells'
   },
   
+
   ru: {
     home: 'Главная',
     predictors: 'Предикторы',
