@@ -14,6 +14,7 @@ import Predictor from './pages/Predictor';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import WheelPredictor from './pages/WheelPredictor';
+import RegisterUI from './pages/RegisterUI';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +35,7 @@ export const PAGES = {
     "Register": Register,
     "Settings": Settings,
     "WheelPredictor": WheelPredictor,
+    "RegisterUI": RegisterUI,
 }
 
 export const pagesConfig = {

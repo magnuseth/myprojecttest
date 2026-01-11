@@ -213,6 +213,10 @@ export const translations = {
     or_continue: 'Or continue with',
     login_error: 'Invalid email or password',
     login_success: 'Successfully logged in!',
+    register_title: 'Create Account',
+    register_subtitle: 'Start predicting today',
+    already_have_account: 'Already have an account?',
+    sign_in: 'Sign In',
     
     // FAQ page
     faq_title: 'Frequently Asked Questions',
@@ -494,6 +498,10 @@ export const translations = {
     or_continue: 'Или продолжить с',
     login_error: 'Неверный email или пароль',
     login_success: 'Успешный вход!',
+    register_title: 'Создать аккаунт',
+    register_subtitle: 'Начните предсказывать сегодня',
+    already_have_account: 'Уже есть аккаунт?',
+    sign_in: 'Войти',
     faq_title: 'Часто задаваемые вопросы',
     faq_subtitle: 'Всё что нужно знать',
     video_tutorial: 'Видео урок',
