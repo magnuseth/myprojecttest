@@ -6,17 +6,22 @@ import MineCell from '../components/mines/MineCell';
 import ControlPanel from '../components/mines/ControlPanel';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PredictionCounter from '../components/PredictionCounter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function MinesPredictor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [mineCount, setMineCount] = useState(3);
   const [safeCells, setSafeCells] = useState([]);
   const [isRevealed, setIsRevealed] = useState(false);
   const [clientSeed, setClientSeed] = useState('');
   const [serverSeed, setServerSeed] = useState('');
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
 
   const totalCells = 25;
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -25,12 +30,43 @@ export default function MinesPredictor() {
       
       if (!authenticated) {
         base44.auth.redirectToLogin(window.location.href);
+      } else {
+        const userData = await base44.auth.me();
+        setUser(userData);
       }
       
       setIsLoading(false);
     };
     checkAuth();
+
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener('languageChange', handleLanguageChange);
+    return () => window.removeEventListener('languageChange', handleLanguageChange);
   }, []);
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const subs = await base44.entities.Subscription.filter({ user_email: user.email });
+      return subs[0] || null;
+    },
+    enabled: !!user?.email
+  });
+
+  const updateSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      if (!subscription) return;
+      await base44.entities.Subscription.update(subscription.id, {
+        predictions_used: subscription.predictions_used + 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    }
+  });
 
   const playPredictSound = () => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -71,7 +107,13 @@ export default function MinesPredictor() {
   };
 
   const handlePredict = () => {
+    if (subscription && subscription.predictions_used >= subscription.predictions_limit) {
+      alert('Попытки закончились! Обновите подписку в настройках.');
+      return;
+    }
+
     playPredictSound();
+    updateSubscriptionMutation.mutate();
     
     const safeCount = totalCells - mineCount;
     const allCells = Array.from({ length: totalCells }, (_, i) => i);
@@ -180,6 +222,13 @@ export default function MinesPredictor() {
           </div>
 
           <div className="lg:col-span-1">
+            {subscription && (
+              <PredictionCounter 
+                used={subscription.predictions_used} 
+                limit={subscription.predictions_limit}
+                language={language}
+              />
+            )}
             <ControlPanel
               mineCount={mineCount}
               onMineCountChange={setMineCount}

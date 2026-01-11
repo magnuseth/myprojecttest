@@ -46,7 +46,7 @@ export default function Layout({ children, currentPageName }) {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Главная
+                {t('home')}
               </Link>
               <Link 
                 to={createPageUrl('Predictor')} 
@@ -56,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Предикторы
+                {t('predictors')}
               </Link>
               
               <Link 
@@ -67,8 +67,10 @@ export default function Layout({ children, currentPageName }) {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                FAQ
+                {t('faq')}
               </Link>
+              
+              <LanguageSelector currentLang={language} onLanguageChange={handleLanguageChange} />
               
               {isAuthenticated ? (
                 <Link 
@@ -80,7 +82,7 @@ export default function Layout({ children, currentPageName }) {
                   }`}
                 >
                   <User className="w-4 h-4 inline mr-1" />
-                  Профиль
+                  {t('profile')}
                 </Link>
               ) : (
                 <Button
@@ -89,7 +91,7 @@ export default function Layout({ children, currentPageName }) {
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold"
                 >
                   <LogIn className="w-4 h-4 mr-2" />
-                  Войти
+                  {t('login')}
                 </Button>
               )}
             </div>
