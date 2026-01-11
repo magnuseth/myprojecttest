@@ -106,6 +106,10 @@ export default function Settings() {
   // Обновление плана
   const updatePlanMutation = useMutation({
     mutationFn: async (planId) => {
+      if (currentSubscription?.plan === planId) {
+        return;
+      }
+      
       const limits = {
         free: 10,
         basic: 100,
@@ -258,9 +262,9 @@ export default function Settings() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-center text-slate-600 text-sm"
+          className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-4 border border-emerald-500/30 text-center"
         >
-          <p>💡 {t('daily_reset')}</p>
+          <p className="text-emerald-400 text-sm font-medium">💡 {t('daily_reset')}</p>
         </motion.div>
       </div>
     </div>

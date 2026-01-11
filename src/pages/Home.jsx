@@ -72,9 +72,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Фоновые эффекты */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl motion-safe:animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       <div className="relative">
@@ -132,7 +132,7 @@ export default function Home() {
               >
                 <Button 
                   onClick={() => base44.auth.redirectToLogin(window.location.origin + createPageUrl('Predictor'))}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group w-full sm:w-auto"
                 >
                   <LogIn className="mr-2 w-5 h-5" />
                   {t('start_prediction')}
@@ -165,7 +165,7 @@ export default function Home() {
                   <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">
                     {stat.value}
                   </div>
-                  <div className="text-slate-400 text-sm">{stat.label}</div>
+                  <div className="text-slate-300 text-sm">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -313,6 +313,7 @@ export default function Home() {
                 href="https://discord.gg/stakeprediction"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Join our Discord community"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg transition-all duration-300"
@@ -324,6 +325,7 @@ export default function Home() {
                 href="https://youtube.com/@stakeprediction"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Watch our YouTube tutorials"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg transition-all duration-300"

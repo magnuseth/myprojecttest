@@ -53,7 +53,7 @@ export default function Layout({ children, currentPageName }) {
             <div className="hidden md:flex items-center gap-6">
               <Link 
                 to={createPageUrl('Home')} 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950 rounded px-2 py-1 ${
                   currentPageName === 'Home' 
                     ? 'text-emerald-400' 
                     : 'text-slate-400 hover:text-white'
@@ -63,7 +63,7 @@ export default function Layout({ children, currentPageName }) {
               </Link>
               <Link 
                 to={createPageUrl('Predictor')} 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950 rounded px-2 py-1 ${
                   currentPageName === 'Predictor' 
                     ? 'text-emerald-400' 
                     : 'text-slate-400 hover:text-white'
@@ -74,7 +74,7 @@ export default function Layout({ children, currentPageName }) {
               
               <Link 
                 to={createPageUrl('FAQ')} 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950 rounded px-2 py-1 ${
                   currentPageName === 'FAQ' 
                     ? 'text-emerald-400' 
                     : 'text-slate-400 hover:text-white'
@@ -85,7 +85,7 @@ export default function Layout({ children, currentPageName }) {
               
               <Link 
                 to={createPageUrl('Mirrors')} 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950 rounded px-2 py-1 ${
                   currentPageName === 'Mirrors' 
                     ? 'text-emerald-400' 
                     : 'text-slate-400 hover:text-white'
@@ -97,7 +97,7 @@ export default function Layout({ children, currentPageName }) {
               {isAuthenticated ? (
                 <Link 
                   to={createPageUrl('Settings')} 
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950 rounded px-2 py-1 ${
                     currentPageName === 'Settings' 
                       ? 'text-emerald-400' 
                       : 'text-slate-400 hover:text-white'

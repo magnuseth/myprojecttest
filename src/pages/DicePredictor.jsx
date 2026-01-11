@@ -176,7 +176,7 @@ export default function DicePredictor() {
             {prediction ? (
               <div className="space-y-6">
                 <div className="text-center">
-                  <div className="text-slate-400 text-sm mb-2">Предсказанный результат</div>
+                  <div className="text-slate-400 text-sm mb-2">{t('result')}</div>
                   <div className="text-8xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-4">
                     {prediction.result}
                   </div>
@@ -191,11 +191,11 @@ export default function DicePredictor() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <div className="text-slate-400 text-sm mb-1">Множитель</div>
+                    <div className="text-slate-400 text-sm mb-1">{t('multiplier')}</div>
                     <div className="text-2xl font-bold text-blue-400">{prediction.multiplier}x</div>
                   </div>
                   <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <div className="text-slate-400 text-sm mb-1">Уверенность</div>
+                    <div className="text-slate-400 text-sm mb-1">{t('confidence')}</div>
                     <div className="text-2xl font-bold text-cyan-400">{prediction.confidence}%</div>
                   </div>
                 </div>
@@ -203,13 +203,10 @@ export default function DicePredictor() {
                 <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl p-4 border border-blue-500/30">
                   <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-yellow-400" />
-                    Рекомендация
+                    {t('recommendations')}
                   </h3>
                   <p className="text-slate-300 text-sm">
-                    {prediction.zone === 'Over 50' 
-                      ? 'Ставьте на Over 50 для оптимальной прибыли'
-                      : 'Ставьте на Under 50 для безопасной игры'
-                    }
+                    {prediction.zone}
                   </p>
                 </div>
               </div>
@@ -217,7 +214,7 @@ export default function DicePredictor() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center text-slate-500">
                   <Dices className="w-20 h-20 mx-auto mb-4 opacity-30" />
-                  <p>Введите seeds и нажмите "Предсказать"</p>
+                  <p>{t('enter_seeds_predict')}</p>
                 </div>
               </div>
             )}
@@ -229,18 +226,18 @@ export default function DicePredictor() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border-2 border-slate-700 shadow-2xl"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Параметры</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('parameters')}</h2>
 
             <div className="space-y-6">
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-blue-400" />
-                  Client Seed
+                  {t('client_seed')}
                 </label>
                 <Input
                   value={clientSeed}
                   onChange={(e) => setClientSeed(e.target.value)}
-                  placeholder="Введите client seed"
+                  placeholder={t('enter_client_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
                 />
               </div>
@@ -248,23 +245,14 @@ export default function DicePredictor() {
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-cyan-400" />
-                  Server Seed
+                  {t('server_seed')}
                 </label>
                 <Input
                   value={serverSeed}
                   onChange={(e) => setServerSeed(e.target.value)}
-                  placeholder="Введите server seed"
+                  placeholder={t('enter_server_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
                 />
-              </div>
-
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-                <h3 className="text-white font-semibold mb-2 text-sm">Как это работает?</h3>
-                <ul className="space-y-1 text-slate-400 text-xs">
-                  <li>• Результат от 0.00 до 100.00</li>
-                  <li>• Over 50: результат выше 50</li>
-                  <li>• Under 50: результат ниже 50</li>
-                </ul>
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -274,7 +262,7 @@ export default function DicePredictor() {
                   className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-6 rounded-xl disabled:opacity-50"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Предсказать
+                  {t('predict')}
                 </Button>
 
                 {prediction && (
@@ -283,7 +271,7 @@ export default function DicePredictor() {
                     className="flex-1 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-semibold py-6 rounded-xl"
                   >
                     <RotateCcw className="w-5 h-5 mr-2" />
-                    Сбросить
+                    {t('reset')}
                   </Button>
                 )}
               </div>

@@ -178,7 +178,7 @@ export default function FlipPredictor() {
             {isFlipping ? (
               <div className="flex items-center justify-center h-full">
                 <motion.div
-                  animate={{ rotateY: [0, 1800] }}
+                  animate={{ rotateY: [0, 360] }}
                   transition={{ duration: 1.5, ease: "easeInOut" }}
                   className="w-40 h-40 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-6xl shadow-2xl"
                 >

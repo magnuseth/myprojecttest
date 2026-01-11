@@ -119,7 +119,7 @@ export default function CrashPredictor() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+        <div className="text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -155,17 +155,17 @@ export default function CrashPredictor() {
           </p>
         </motion.div>
 
+        {subscription && (
+          <div className="mb-8">
+            <PredictionCounter 
+              used={subscription.predictions_used} 
+              limit={subscription.predictions_limit}
+              language={language}
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {subscription && (
-            <div className="lg:col-span-2">
-              <PredictionCounter 
-                used={subscription.predictions_used} 
-                limit={subscription.predictions_limit}
-                language={language}
-              />
-            </div>
-          )}
-          
           {/* Результат */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -175,7 +175,7 @@ export default function CrashPredictor() {
             {prediction ? (
               <div className="space-y-6">
                 <div className="text-center">
-                  <div className="text-slate-400 text-sm mb-2">Предсказанная точка краха</div>
+                  <div className="text-slate-400 text-sm mb-2">{t('predicted_crash_point')}</div>
                   <div className="text-7xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4">
                     {prediction.crashPoint}x
                   </div>
@@ -183,11 +183,11 @@ export default function CrashPredictor() {
 
                 <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl p-6 border border-orange-500/30">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-slate-300">Рекомендуемый выход</span>
+                    <span className="text-slate-300">{t('recommended_exit')}</span>
                     <span className="text-2xl font-bold text-green-400">{prediction.safeExit}x</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Уверенность</span>
+                    <span className="text-slate-300">{t('confidence')}</span>
                     <span className="text-xl font-bold text-orange-400">{prediction.confidence}%</span>
                   </div>
                 </div>
@@ -195,12 +195,10 @@ export default function CrashPredictor() {
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                   <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-yellow-400" />
-                    Рекомендации
+                    {t('recommendations')}
                   </h3>
                   <ul className="space-y-1 text-slate-400 text-sm">
-                    <li>• Выходите до достижения предсказанной точки</li>
-                    <li>• Безопасная зона: до {prediction.safeExit}x</li>
-                    <li>• Не рискуйте всей суммой</li>
+                    <li>• {t('recommended_exit')}: {prediction.safeExit}x</li>
                   </ul>
                 </div>
               </div>
@@ -208,7 +206,7 @@ export default function CrashPredictor() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center text-slate-500">
                   <TrendingUp className="w-20 h-20 mx-auto mb-4 opacity-30" />
-                  <p>Введите seeds и нажмите "Предсказать"</p>
+                  <p>{t('enter_seeds_predict')}</p>
                 </div>
               </div>
             )}
@@ -220,18 +218,18 @@ export default function CrashPredictor() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border-2 border-slate-700 shadow-2xl"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Параметры</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('parameters')}</h2>
 
             <div className="space-y-6">
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-orange-400" />
-                  Client Seed
+                  {t('client_seed')}
                 </label>
                 <Input
                   value={clientSeed}
                   onChange={(e) => setClientSeed(e.target.value)}
-                  placeholder="Введите client seed"
+                  placeholder={t('enter_client_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-orange-500 focus:ring-orange-500/20"
                 />
               </div>
@@ -239,12 +237,12 @@ export default function CrashPredictor() {
               <div>
                 <label className="text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-red-400" />
-                  Server Seed
+                  {t('server_seed')}
                 </label>
                 <Input
                   value={serverSeed}
                   onChange={(e) => setServerSeed(e.target.value)}
-                  placeholder="Введите server seed"
+                  placeholder={t('enter_server_seed')}
                   className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-red-500/20"
                 />
               </div>
@@ -256,7 +254,7 @@ export default function CrashPredictor() {
                   className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-6 rounded-xl disabled:opacity-50"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Предсказать
+                  {t('predict')}
                 </Button>
 
                 {prediction && (
@@ -265,7 +263,7 @@ export default function CrashPredictor() {
                     className="flex-1 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-semibold py-6 rounded-xl"
                   >
                     <RotateCcw className="w-5 h-5 mr-2" />
-                    Сбросить
+                    {t('reset')}
                   </Button>
                 )}
               </div>

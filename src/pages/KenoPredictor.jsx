@@ -197,8 +197,8 @@ export default function KenoPredictor() {
                     className={`
                       aspect-square rounded-xl transition-all duration-300 flex items-center justify-center font-bold
                       ${isRevealed && luckyNumbers.includes(number)
-                        ? 'bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 shadow-[0_0_20px_rgba(236,72,153,0.5)] border-2 border-pink-400 text-white text-lg scale-110'
-                        : 'bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-700 text-slate-400 text-sm'
+                        ? 'bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 shadow-[0_0_20px_rgba(236,72,153,0.5)] border-2 border-pink-400 text-white text-base md:text-lg scale-110'
+                        : 'bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-700 text-slate-400 text-xs md:text-sm'
                       }
                     `}
                   >

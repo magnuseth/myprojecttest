@@ -145,7 +145,7 @@ export default function MinesPredictor() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+        <div className="text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -162,8 +162,8 @@ export default function MinesPredictor() {
       </div>
 
       <div className="relative max-w-7xl mx-auto">
-        <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        <Link to={createPageUrl('Predictor')} className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors group min-h-[44px] min-w-[44px]">
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span>{t('back_to_selection')}</span>
         </Link>
 
@@ -242,6 +242,7 @@ export default function MinesPredictor() {
               serverSeed={serverSeed}
               onClientSeedChange={setClientSeed}
               onServerSeedChange={setServerSeed}
+              language={language}
             />
           </div>
         </div>
