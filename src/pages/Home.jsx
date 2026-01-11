@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import { Sparkles, Zap, Shield, TrendingUp, Users, Trophy, ArrowRight, Gem, CheckCircle } from 'lucide-react';
+import { Sparkles, Zap, Shield, TrendingUp, Users, Trophy, ArrowRight, Gem, CheckCircle, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { base44 } from '@/api/base44Client';
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authenticated = await base44.auth.isAuthenticated();
+      setIsAuthenticated(authenticated);
+    };
+    checkAuth();
+  }, []);
+
   const features = [
     {
       icon: Zap,
@@ -98,16 +109,30 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center items-center"
               >
-                <Link to={createPageUrl('Predictor')}>
-                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
-                    Начать предсказание
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                
-                <Button variant="outline" className="border-2 border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
-                  Как это работает?
-                </Button>
+                {isAuthenticated ? (
+                  <Link to={createPageUrl('Predictor')}>
+                    <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
+                      Начать предсказание
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to={createPageUrl('Login')}>
+                      <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-8 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
+                        <LogIn className="mr-2 w-5 h-5" />
+                        Войти
+                      </Button>
+                    </Link>
+                    
+                    <Link to={createPageUrl('Register')}>
+                      <Button variant="outline" className="border-2 border-emerald-500/50 bg-slate-800/50 hover:bg-emerald-500/10 text-white font-semibold text-lg px-8 py-7 rounded-xl backdrop-blur-sm">
+                        <UserPlus className="mr-2 w-5 h-5" />
+                        Регистрация
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </motion.div>
             </motion.div>
 
@@ -267,12 +292,21 @@ export default function Home() {
               <p className="text-slate-400 text-xl mb-8">
                 Присоединяйтесь к тысячам пользователей уже сейчас
               </p>
-              <Link to={createPageUrl('Predictor')}>
-                <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-10 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
-                  Запустить предиктор
-                  <Sparkles className="ml-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <Link to={createPageUrl('Predictor')}>
+                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-10 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
+                    Запустить предиктор
+                    <Sparkles className="ml-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
+                  </Button>
+                </Link>
+              ) : (
+                <Link to={createPageUrl('Register')}>
+                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-lg px-10 py-7 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 group">
+                    Зарегистрироваться бесплатно
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              )}
             </motion.div>
           </div>
         </section>
