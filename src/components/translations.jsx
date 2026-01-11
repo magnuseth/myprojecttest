@@ -173,6 +173,28 @@ export const translations = {
     feature_instant_desc: 'No delays',
     need_help: 'Need More Help?',
     join_community: 'Join our community for support',
+
+    // FAQ Questions & Answers
+    faq_q1: 'What is Stake Prediction?',
+    faq_a1: 'Stake Prediction is a professional AI tool for predicting results in popular Stake.com games. We use a provably fair system with custom seed support for generating predictions.',
+    faq_q2: 'How does the prediction system work?',
+    faq_a2: 'Our system uses cryptographic algorithms to generate predictions based on client seed and server seed. This ensures full transparency and verifiability of each result. You can use your own seeds or generate random ones.',
+    faq_q3: 'Which games are supported?',
+    faq_a3: 'We support 8 popular games: Mines (finding safe cells), Crash (crash point prediction), Chicken (safe cells), Dice (roll result), Limbo (multiplier), Wheel (winning segment), Flip (coin flip), and Keno (winning numbers).',
+    faq_q4: 'What is the provably fair system?',
+    faq_a4: 'Provably Fair is a system that allows you to verify the fairness of each result. Using client seed and server seed, you can independently reproduce and verify any prediction. This guarantees full transparency and absence of manipulation.',
+    faq_q5: 'How to use seeds?',
+    faq_a5: 'Seeds are unique strings used to generate results. You can set the client seed yourself (or use random), and the server seed is usually taken from the game on Stake. The combination of these seeds determines the prediction result. You can use the same seeds as in the game for verification.',
+    faq_q6: 'How much does it cost?',
+    faq_a6: 'We have a free plan with 10 attempts for beginners. For more active use, paid plans are available: Basic (50 attempts), Pro (200 attempts), and Unlimited (unlimited). All plans include access to all 8 games.',
+    faq_q7: 'Does this guarantee a win?',
+    faq_a7: 'No, Stake Prediction is a prediction tool but does not guarantee 100% wins. Game results depend on many factors. Use our service responsibly and only for entertainment. Never bet more than you can afford to lose.',
+    faq_q8: 'How does the attempt counter work?',
+    faq_a8: 'Each prediction uses one attempt from your limit. The limit depends on your subscription plan. Attempts are renewed monthly. You can always see remaining attempts in the predictor interface.',
+    faq_q9: 'Can I use it on mobile devices?',
+    faq_a9: 'Yes! Stake Prediction is fully adapted for mobile devices. You can use all features on smartphone or tablet via browser.',
+    faq_q10: 'How to get support?',
+    faq_a10: 'Join our Discord server for help from the community and support team. You can also watch tutorial videos on our YouTube channel.',
     
     // Predictor selection
     choose_game: 'Choose a game',
@@ -531,7 +553,29 @@ export const translations = {
     feature_instant: 'Resultados Instantáneos',
     feature_instant_desc: 'Sin retrasos',
     need_help: '¿Necesitas Ayuda?',
-    join_community: 'Únete a nuestra comunidad'
+    join_community: 'Únete a nuestra comunidad',
+
+    // FAQ Preguntas y Respuestas
+    faq_q1: '¿Qué es Stake Prediction?',
+    faq_a1: 'Stake Prediction es una herramienta profesional de IA para predecir resultados en juegos populares de Stake.com. Utilizamos un sistema comprobablemente justo con soporte de seeds personalizados para generar predicciones.',
+    faq_q2: '¿Cómo funciona el sistema de predicción?',
+    faq_a2: 'Nuestro sistema utiliza algoritmos criptográficos para generar predicciones basadas en client seed y server seed. Esto asegura total transparencia y verificabilidad de cada resultado. Puedes usar tus propios seeds o generar aleatorios.',
+    faq_q3: '¿Qué juegos están soportados?',
+    faq_a3: 'Soportamos 8 juegos populares: Mines (encontrar celdas seguras), Crash (predicción de punto de caída), Chicken (celdas seguras), Dice (resultado de dado), Limbo (multiplicador), Wheel (segmento ganador), Flip (cara o cruz), y Keno (números ganadores).',
+    faq_q4: '¿Qué es el sistema comprobablemente justo?',
+    faq_a4: 'Provably Fair es un sistema que permite verificar la honestidad de cada resultado. Usando client seed y server seed, puedes reproducir y verificar independientemente cualquier predicción. Esto garantiza total transparencia y ausencia de manipulación.',
+    faq_q5: '¿Cómo usar los seeds?',
+    faq_a5: 'Los seeds son cadenas únicas utilizadas para generar resultados. Puedes establecer el client seed tú mismo (o usar aleatorio), y el server seed generalmente se toma del juego en Stake. La combinación de estos seeds determina el resultado de la predicción.',
+    faq_q6: '¿Cuánto cuesta?',
+    faq_a6: 'Tenemos un plan gratuito con 10 intentos para principiantes. Para uso más activo, están disponibles planes de pago: Basic (50 intentos), Pro (200 intentos) y Unlimited (ilimitado). Todos los planes incluyen acceso a los 8 juegos.',
+    faq_q7: '¿Esto garantiza una victoria?',
+    faq_a7: 'No, Stake Prediction es una herramienta de predicción pero no garantiza victorias al 100%. Los resultados del juego dependen de muchos factores. Usa nuestro servicio de manera responsable y solo para entretenimiento. Nunca apuestes más de lo que puedas permitirte perder.',
+    faq_q8: '¿Cómo funciona el contador de intentos?',
+    faq_a8: 'Cada predicción usa un intento de tu límite. El límite depende de tu plan de suscripción. Los intentos se renuevan mensualmente. Siempre puedes ver los intentos restantes en la interfaz del predictor.',
+    faq_q9: '¿Puedo usarlo en dispositivos móviles?',
+    faq_a9: '¡Sí! Stake Prediction está completamente adaptado para dispositivos móviles. Puedes usar todas las funciones en smartphone o tablet a través del navegador.',
+    faq_q10: '¿Cómo obtener soporte?',
+    faq_a10: 'Únete a nuestro servidor de Discord para obtener ayuda de la comunidad y del equipo de soporte. También puedes ver videos tutoriales en nuestro canal de YouTube.',
   },
   
   pt: {
@@ -657,7 +701,29 @@ export const translations = {
     feature_instant: 'Resultados Instantâneos',
     feature_instant_desc: 'Sem atrasos',
     need_help: 'Precisa de Ajuda?',
-    join_community: 'Junte-se à nossa comunidade'
+    join_community: 'Junte-se à nossa comunidade',
+
+    // FAQ Perguntas e Respostas
+    faq_q1: 'O que é Stake Prediction?',
+    faq_a1: 'Stake Prediction é uma ferramenta profissional de IA para prever resultados em jogos populares do Stake.com. Usamos um sistema comprovadamente justo com suporte a seeds personalizados para gerar previsões.',
+    faq_q2: 'Como funciona o sistema de previsão?',
+    faq_a2: 'Nosso sistema usa algoritmos criptográficos para gerar previsões baseadas em client seed e server seed. Isso garante total transparência e verificabilidade de cada resultado. Você pode usar seus próprios seeds ou gerar aleatórios.',
+    faq_q3: 'Quais jogos são suportados?',
+    faq_a3: 'Suportamos 8 jogos populares: Mines (encontrar células seguras), Crash (previsão de ponto de queda), Chicken (células seguras), Dice (resultado do dado), Limbo (multiplicador), Wheel (segmento vencedor), Flip (cara ou coroa), e Keno (números vencedores).',
+    faq_q4: 'O que é o sistema comprovadamente justo?',
+    faq_a4: 'Provably Fair é um sistema que permite verificar a honestidade de cada resultado. Usando client seed e server seed, você pode reproduzir e verificar independentemente qualquer previsão. Isso garante total transparência e ausência de manipulação.',
+    faq_q5: 'Como usar os seeds?',
+    faq_a5: 'Seeds são strings únicas usadas para gerar resultados. Você pode definir o client seed você mesmo (ou usar aleatório), e o server seed geralmente é obtido do jogo no Stake. A combinação desses seeds determina o resultado da previsão.',
+    faq_q6: 'Quanto custa?',
+    faq_a6: 'Temos um plano gratuito com 10 tentativas para iniciantes. Para uso mais ativo, planos pagos estão disponíveis: Basic (50 tentativas), Pro (200 tentativas) e Unlimited (ilimitado). Todos os planos incluem acesso aos 8 jogos.',
+    faq_q7: 'Isso garante uma vitória?',
+    faq_a7: 'Não, Stake Prediction é uma ferramenta de previsão mas não garante vitórias em 100%. Os resultados do jogo dependem de muitos fatores. Use nosso serviço com responsabilidade e apenas para entretenimento. Nunca aposte mais do que pode perder.',
+    faq_q8: 'Como funciona o contador de tentativas?',
+    faq_a8: 'Cada previsão usa uma tentativa do seu limite. O limite depende do seu plano de assinatura. As tentativas são renovadas mensalmente. Você sempre pode ver as tentativas restantes na interface do preditor.',
+    faq_q9: 'Posso usar em dispositivos móveis?',
+    faq_a9: 'Sim! Stake Prediction é totalmente adaptado para dispositivos móveis. Você pode usar todos os recursos em smartphone ou tablet via navegador.',
+    faq_q10: 'Como obter suporte?',
+    faq_a10: 'Junte-se ao nosso servidor Discord para obter ajuda da comunidade e da equipe de suporte. Você também pode assistir vídeos tutoriais em nosso canal do YouTube.',
   },
   
   tr: {
@@ -783,7 +849,29 @@ export const translations = {
     feature_instant: 'Anında Sonuçlar',
     feature_instant_desc: 'Gecikme yok',
     need_help: 'Daha Fazla Yardım mı Lazım?',
-    join_community: 'Topluluğumuza katılın'
+    join_community: 'Topluluğumuza katılın',
+
+    // FAQ Sorular ve Cevaplar
+    faq_q1: 'Stake Prediction nedir?',
+    faq_a1: 'Stake Prediction, Stake.com\'daki popüler oyunlarda sonuçları tahmin etmek için profesyonel bir AI aracıdır. Tahminler oluşturmak için özel seed desteği olan kanıtlanabilir adil bir sistem kullanıyoruz.',
+    faq_q2: 'Tahmin sistemi nasıl çalışır?',
+    faq_a2: 'Sistemimiz, client seed ve server seed\'e dayalı tahminler oluşturmak için kriptografik algoritmalar kullanır. Bu, her sonucun tam şeffaflığını ve doğrulanabilirliğini sağlar. Kendi seedlerinizi kullanabilir veya rastgele oluşturabilirsiniz.',
+    faq_q3: 'Hangi oyunlar destekleniyor?',
+    faq_a3: '8 popüler oyunu destekliyoruz: Mines (güvenli hücreleri bulma), Crash (çökme noktası tahmini), Chicken (güvenli hücreler), Dice (zar sonucu), Limbo (çarpan), Wheel (kazanan segment), Flip (yazı tura), ve Keno (kazanan sayılar).',
+    faq_q4: 'Kanıtlanabilir adil sistem nedir?',
+    faq_a4: 'Provably Fair, her sonucun dürüstlüğünü doğrulamanıza olanak tanıyan bir sistemdir. Client seed ve server seed kullanarak, herhangi bir tahmini bağımsız olarak yeniden üretebilir ve doğrulayabilirsiniz. Bu, tam şeffaflık ve manipülasyon olmamasını garanti eder.',
+    faq_q5: 'Seedler nasıl kullanılır?',
+    faq_a5: 'Seedler, sonuçları oluşturmak için kullanılan benzersiz dizelerdir. Client seed\'i kendiniz ayarlayabilir (veya rastgele kullanabilirsiniz) ve server seed genellikle Stake\'deki oyundan alınır. Bu seedlerin kombinasyonu tahmin sonucunu belirler.',
+    faq_q6: 'Maliyeti nedir?',
+    faq_a6: 'Yeni başlayanlar için 10 deneme içeren ücretsiz bir planımız var. Daha aktif kullanım için ücretli planlar mevcuttur: Basic (50 deneme), Pro (200 deneme) ve Unlimited (sınırsız). Tüm planlar 8 oyuna erişim içerir.',
+    faq_q7: 'Bu kazanmayı garanti eder mi?',
+    faq_a7: 'Hayır, Stake Prediction bir tahmin aracıdır ancak %100 kazanma garantisi vermez. Oyun sonuçları birçok faktöre bağlıdır. Hizmetimizi sorumlu bir şekilde ve yalnızca eğlence için kullanın. Kaybetmeyi göze alamayacağınızdan fazlasını asla bahis yapmayın.',
+    faq_q8: 'Deneme sayacı nasıl çalışır?',
+    faq_a8: 'Her tahmin, limitinizden bir deneme kullanır. Limit, abonelik planınıza bağlıdır. Denemeler aylık olarak yenilenir. Kalan denemeleri tahmin edici arayüzünde her zaman görebilirsiniz.',
+    faq_q9: 'Mobil cihazlarda kullanabilir miyim?',
+    faq_a9: 'Evet! Stake Prediction mobil cihazlar için tamamen uyarlanmıştır. Tüm özellikleri tarayıcı aracılığıyla akıllı telefon veya tablette kullanabilirsiniz.',
+    faq_q10: 'Nasıl destek alabilirim?',
+    faq_a10: 'Topluluktan ve destek ekibinden yardım almak için Discord sunucumuza katılın. YouTube kanalımızda eğitim videolarını da izleyebilirsiniz.',
   },
   
   hi: {
@@ -909,7 +997,29 @@ export const translations = {
     feature_instant: 'तत्काल परिणाम',
     feature_instant_desc: 'कोई देरी नहीं',
     need_help: 'अधिक सहायता चाहिए?',
-    join_community: 'हमारे समुदाय में शामिल हों'
+    join_community: 'हमारे समुदाय में शामिल हों',
+
+    // FAQ प्रश्न और उत्तर
+    faq_q1: 'Stake Prediction क्या है?',
+    faq_a1: 'Stake Prediction Stake.com पर लोकप्रिय खेलों में परिणामों की भविष्यवाणी करने के लिए एक पेशेवर AI उपकरण है। हम भविष्यवाणियां उत्पन्न करने के लिए कस्टम seed समर्थन के साथ एक सिद्ध रूप से निष्पक्ष प्रणाली का उपयोग करते हैं।',
+    faq_q2: 'भविष्यवाणी प्रणाली कैसे काम करती है?',
+    faq_a2: 'हमारी प्रणाली client seed और server seed के आधार पर भविष्यवाणियां उत्पन्न करने के लिए क्रिप्टोग्राफिक एल्गोरिदम का उपयोग करती है। यह प्रत्येक परिणाम की पूर्ण पारदर्शिता और सत्यापन क्षमता सुनिश्चित करता है। आप अपने स्वयं के seeds का उपयोग कर सकते हैं या यादृच्छिक उत्पन्न कर सकते हैं।',
+    faq_q3: 'कौन से खेल समर्थित हैं?',
+    faq_a3: 'हम 8 लोकप्रिय खेलों का समर्थन करते हैं: Mines (सुरक्षित सेल खोजना), Crash (क्रैश बिंदु भविष्यवाणी), Chicken (सुरक्षित सेल), Dice (पासा परिणाम), Limbo (गुणक), Wheel (विजेता खंड), Flip (सिक्का उछाल), और Keno (विजेता संख्याएं)।',
+    faq_q4: 'सिद्ध रूप से निष्पक्ष प्रणाली क्या है?',
+    faq_a4: 'Provably Fair एक ऐसी प्रणाली है जो आपको प्रत्येक परिणाम की ईमानदारी को सत्यापित करने की अनुमति देती है। Client seed और server seed का उपयोग करके, आप स्वतंत्र रूप से किसी भी भविष्यवाणी को पुन: उत्पन्न और सत्यापित कर सकते हैं। यह पूर्ण पारदर्शिता और हेरफेर की अनुपस्थिति की गारंटी देता है।',
+    faq_q5: 'Seeds का उपयोग कैसे करें?',
+    faq_a5: 'Seeds अद्वितीय स्ट्रिंग्स हैं जिनका उपयोग परिणाम उत्पन्न करने के लिए किया जाता है। आप client seed स्वयं सेट कर सकते हैं (या यादृच्छिक उपयोग कर सकते हैं), और server seed आमतौर पर Stake पर खेल से लिया जाता है। इन seeds का संयोजन भविष्यवाणी परिणाम निर्धारित करता है।',
+    faq_q6: 'इसकी लागत कितनी है?',
+    faq_a6: 'शुरुआती लोगों के लिए 10 प्रयासों के साथ हमारी एक निःशुल्क योजना है। अधिक सक्रिय उपयोग के लिए, भुगतान योजनाएं उपलब्ध हैं: Basic (50 प्रयास), Pro (200 प्रयास) और Unlimited (असीमित)। सभी योजनाओं में 8 खेलों तक पहुंच शामिल है।',
+    faq_q7: 'क्या यह जीत की गारंटी देता है?',
+    faq_a7: 'नहीं, Stake Prediction एक भविष्यवाणी उपकरण है लेकिन 100% जीत की गारंटी नहीं देता है। खेल परिणाम कई कारकों पर निर्भर करते हैं। हमारी सेवा का जिम्मेदारी से और केवल मनोरंजन के लिए उपयोग करें। कभी भी उससे अधिक दांव न लगाएं जितना आप खोने का जोखिम उठा सकते हैं।',
+    faq_q8: 'प्रयास काउंटर कैसे काम करता है?',
+    faq_a8: 'प्रत्येक भविष्यवाणी आपकी सीमा से एक प्रयास का उपयोग करती है। सीमा आपकी सदस्यता योजना पर निर्भर करती है। प्रयास मासिक नवीनीकृत होते हैं। आप हमेशा भविष्यवक्ता इंटरफ़ेस में शेष प्रयास देख सकते हैं।',
+    faq_q9: 'क्या मैं मोबाइल उपकरणों पर उपयोग कर सकता हूं?',
+    faq_a9: 'हां! Stake Prediction मोबाइल उपकरणों के लिए पूरी तरह से अनुकूलित है। आप ब्राउज़र के माध्यम से स्मार्टफोन या टैबलेट पर सभी सुविधाओं का उपयोग कर सकते हैं।',
+    faq_q10: 'सहायता कैसे प्राप्त करें?',
+    faq_a10: 'समुदाय और सहायता टीम से सहायता प्राप्त करने के लिए हमारे Discord सर्वर में शामिल हों। आप हमारे YouTube चैनल पर ट्यूटोरियल वीडियो भी देख सकते हैं।',
   }
 };
 
