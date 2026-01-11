@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { Gem } from 'lucide-react';
+import { Gem, LogIn, User } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
 
 export default function Layout({ children, currentPageName }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authenticated = await base44.auth.isAuthenticated();
+      setIsAuthenticated(authenticated);
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogin = () => {
+    base44.auth.redirectToLogin();
+  };
+
   return (
     <div className="min-h-screen">
       {/* Навигация */}
@@ -42,16 +58,29 @@ export default function Layout({ children, currentPageName }) {
               >
                 Предиктор
               </Link>
-              <Link 
-                to={createPageUrl('Settings')} 
-                className={`text-sm font-medium transition-colors ${
-                  currentPageName === 'Settings' 
-                    ? 'text-emerald-400' 
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Настройки
-              </Link>
+              
+              {isAuthenticated ? (
+                <Link 
+                  to={createPageUrl('Settings')} 
+                  className={`text-sm font-medium transition-colors ${
+                    currentPageName === 'Settings' 
+                      ? 'text-emerald-400' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <User className="w-4 h-4 inline mr-1" />
+                  Профиль
+                </Link>
+              ) : (
+                <Button
+                  onClick={handleLogin}
+                  size="sm"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Войти
+                </Button>
+              )}
             </div>
           </div>
         </div>
