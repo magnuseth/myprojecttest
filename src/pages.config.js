@@ -1,5 +1,4 @@
 import Blowjow from './pages/Blowjow';
-import ChickenPredictor from './pages/ChickenPredictor';
 import CrashPredictor from './pages/CrashPredictor';
 import CryptoPayment from './pages/CryptoPayment';
 import DicePredictor from './pages/DicePredictor';
@@ -12,15 +11,15 @@ import MinesPredictor from './pages/MinesPredictor';
 import Mirrors from './pages/Mirrors';
 import Predictor from './pages/Predictor';
 import Register from './pages/Register';
+import RegisterUI from './pages/RegisterUI';
 import Settings from './pages/Settings';
 import WheelPredictor from './pages/WheelPredictor';
-import RegisterUI from './pages/RegisterUI';
+import ChickenPredictor from './pages/ChickenPredictor';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Blowjow": Blowjow,
-    "ChickenPredictor": ChickenPredictor,
     "CrashPredictor": CrashPredictor,
     "CryptoPayment": CryptoPayment,
     "DicePredictor": DicePredictor,
@@ -33,9 +32,10 @@ export const PAGES = {
     "Mirrors": Mirrors,
     "Predictor": Predictor,
     "Register": Register,
+    "RegisterUI": RegisterUI,
     "Settings": Settings,
     "WheelPredictor": WheelPredictor,
-    "RegisterUI": RegisterUI,
+    "ChickenPredictor": ChickenPredictor,
 }
 
 export const pagesConfig = {
