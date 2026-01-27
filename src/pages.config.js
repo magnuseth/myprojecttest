@@ -12,9 +12,9 @@ import MinesPredictor from './pages/MinesPredictor';
 import Mirrors from './pages/Mirrors';
 import Predictor from './pages/Predictor';
 import Register from './pages/Register';
+import RegisterUI from './pages/RegisterUI';
 import Settings from './pages/Settings';
 import WheelPredictor from './pages/WheelPredictor';
-import RegisterUI from './pages/RegisterUI';
 import __Layout from './Layout.jsx';
 
 
@@ -33,9 +33,9 @@ export const PAGES = {
     "Mirrors": Mirrors,
     "Predictor": Predictor,
     "Register": Register,
+    "RegisterUI": RegisterUI,
     "Settings": Settings,
     "WheelPredictor": WheelPredictor,
-    "RegisterUI": RegisterUI,
 }
 
 export const pagesConfig = {
