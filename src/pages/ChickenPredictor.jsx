@@ -81,14 +81,22 @@ export default function ChickenPredictor() {
     setResult(null);
 
     try {
-      const response = await base44.functions.invoke('getChickenValue', {
-        clientSeed: clientSeed || null,
-        serverSeed: serverSeed || null,
-        difficulty: difficulty
+      const response = await fetch('https://aquila.cash/api/v1/prediction/chicken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clientSeed: clientSeed || null,
+          serverSeed: serverSeed || null,
+          difficulty: difficulty
+        })
       });
 
+      const data = await response.json();
+      
       setTimeout(() => {
-        setResult(response.data.result);
+        setResult(data.result);
         setIsCalculating(false);
         updateSubscriptionMutation.mutate();
       }, 800);
